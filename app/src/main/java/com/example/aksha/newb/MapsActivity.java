@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,6 +17,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,11 +29,27 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Location currentLocation;
+    public static int upload=0;
+    protected Bitmap bitmap;
+    protected  String title;
+
+
+    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    DatabaseReference reference;
+    LocationManager locationManager;
+    LocationListener locationListener;
 
     public void setCurrentLocation(Location current) {
         this.currentLocation = current;
@@ -39,7 +59,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -59,12 +78,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (requestCode == 123) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            bitmap = (Bitmap) extras.get("data");
 
             Intent intent = new Intent(this, Info.class);
-            intent.putExtra("Image", imageBitmap);
-            setMarker(imageBitmap);
+            intent.putExtra("Image", bitmap);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -92,44 +111,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
     }
 
-    public void setMarker(Bitmap bitmap) {
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.INTERNET, Manifest.permission.CAMERA
-            }, 200);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                setCurrentLocation(location);
-            }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.w("onResume : ", String.valueOf(upload) );
+            reference = firebaseDatabase.getReference();
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        HashMap<String, Object> map = (HashMap) snapshot.getValue();
+                        Log.w("Title", snapshot.child("Title").getValue().toString());
+                        //Log.w("Bitmap", snapshot.child("Bitmap").getValue().toString());
+                        //Log.w("Location", snapshot.child("Location").getValue().toString());
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+                        String longitude = snapshot.child("LocationLong").getValue().toString();
+                        String latitude = snapshot.child("LocationLati").getValue().toString();
+                        //HashMap<String, Object> map = new HashMap<>();
+                        byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
+                        Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                        Log.w("Bitmap is : ", image.toString());
+                        bitmap = image;
 
-            }
+                        //bitmap = Bitmap.createBitmap((Bitmap)snapshot.child("Bitmap").getValue());
+                        title = snapshot.child("Title").toString();
+                        setMarker(longitude, latitude, bitmap, title);
+                        //Log.w("Value from DB", image.toString());
+                    }
+                }
 
-            @Override
-            public void onProviderEnabled(String provider) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.w("Value from DB", "OnCancelledCalled");
+                }
+            });
+        }
 
-            }
 
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        });
-
+    public void setMarker(String longitude, String latitude, Bitmap bitmap, String Title) {
+        Log.w("Value from DB", "SetMarker chala");
         BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-        LatLng current = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(current).icon(bitmapDescriptor));
+        Log.w("Image is : ", bitmap.toString());
+
+        Log.e("Longitude", longitude);
+        Log.e("Latitude", latitude);
+
+        LatLng current = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
+        mMap.addMarker(new MarkerOptions().position(current).icon(bitmapDescriptor).title(Title));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
 
     }
 
-}
 }
 
 
