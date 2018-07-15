@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">NewB</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="currency">
+        <item>$</item>
+        <item>₹</item>
+        <item>€</item>
+        <item>¥</item>
+        <item>£</item>
+    </string-array>
+
 </resources>

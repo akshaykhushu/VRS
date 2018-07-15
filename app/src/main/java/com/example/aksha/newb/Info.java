@@ -59,6 +59,8 @@ public class Info extends AppCompatActivity {
             return;
         }
         EditText eT = findViewById(R.id.nameEditText);
+        EditText eTdes = findViewById(R.id.editTextDescription);
+        EditText eTcost = findViewById(R.id.editTextCost);
 
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
@@ -67,13 +69,6 @@ public class Info extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
         byte [] b=ByteStream.toByteArray();
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
-//        MarkerInfoClass markerInfoClass = new MarkerInfoClass();
-//        markerInfoClass.bitmap =temp;
-//        markerInfoClass.Title = eT.getText().toString();
-//        markerInfoClass.location = location;
-//        databaseReference.setValue(markerInfoClass);
-//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//        byte[] bytes = bos.toByteArray();
         Log.e("Longitude", String.valueOf(location.getLongitude()));
         Log.e("Latitude", String.valueOf(location.getLatitude()));
 
@@ -81,6 +76,8 @@ public class Info extends AppCompatActivity {
         databaseReference.child("LocationLong").setValue(String.valueOf(location.getLongitude()));
         databaseReference.child("LocationLati").setValue(String.valueOf(location.getLatitude()));
         databaseReference.child("Title").setValue(eT.getText().toString());
+        databaseReference.child("Description").setValue(eTdes.getText().toString());
+        databaseReference.child("Cost").setValue(eTcost.getText().toString());
         MapsActivity.upload = 1;
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);

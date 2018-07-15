@@ -8,21 +8,21 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="381dp"
+        android:layout_height="281dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="29dp"
+        android:layout_marginTop="0dp"
         tools:layout_editor_absoluteX="92dp"
         tools:layout_editor_absoluteY="62dp" />
 
     <EditText
         android:id="@+id/nameEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="115dp"
+        android:layout_marginBottom="167dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
@@ -31,12 +31,43 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="43dp"
-        android:layout_marginEnd="117dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
         android:onClick="Upload"
         android:text="Upload" />
+
+    <EditText
+        android:id="@+id/editTextCost"
+        android:layout_width="267dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/nameEditText"
+        android:layout_marginBottom="57dp"
+        android:layout_marginStart="41dp"
+        android:ems="10"
+        android:hint="Cost"
+        android:inputType="numberDecimal" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/editTextCost"
+        android:entries="@array/currency"
+        android:spinnerMode="dialog" />
+
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="299dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="112dp"
+        android:ems="10"
+        android:hint="Description"
+        android:inputType="textMultiLine" />
 </RelativeLayout>
