@@ -1,6 +1,7 @@
 package com.example.aksha.newb;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,7 +9,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -21,10 +25,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,12 +53,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Location currentLocation;
     public static int upload=0;
-    protected Bitmap bitmap;
+    protected Bitmap bitmap, circularBitmap;
     protected  String title;
     protected  String description;
     protected String cost;
@@ -176,8 +185,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e("Latitude", latitude);
 
         LatLng current = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
+        circularBitmap = getCroppedBitmap(bitmap);
         BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-        mMap.addMarker(new MarkerOptions().position(current).icon(bitmapDescriptor).title(Title));
+        BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
+        mMap.addMarker(new MarkerOptions().position(current).icon(bitmapDescriptor2).title(Title));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -200,7 +211,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-    }
+        }
+
+
+//    public Bitmap createCustomMarker(Context context, String _name, Bitmap bitmap) {
+//
+//        View marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.markerlayout, null);
+//
+//        CircleImageView markerImage = (CircleImageView) marker.findViewById(R.id.user_dp);
+//        markerImage.setImageBitmap(bitmap);
+//        TextView txt_name = (TextView)marker.findViewById(R.id.name);
+//        txt_name.setText(_name);
+//
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        marker.setLayoutParams(new ViewGroup.LayoutParams(52, ViewGroup.LayoutParams.WRAP_CONTENT));
+//        marker.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+//        marker.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+//        marker.buildDrawingCache();
+//        Bitmap bitmap2= Bitmap.createBitmap(marker.getMeasuredWidth(), marker.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap2);
+//        marker.draw(canvas);
+//        ImageView imageView = findViewById(R.id.imageViewMarkerClicked);
+//
+//        return bitmap;
+//
+//    }
+public Bitmap getCroppedBitmap(Bitmap bitmap) {
+    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+            bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(output);
+
+    final int color = 0xff424242;
+    final Paint paint = new Paint();
+    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+    paint.setAntiAlias(true);
+    canvas.drawARGB(0, 0, 0, 0);
+    paint.setColor(color);
+    // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+    canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+            bitmap.getWidth() / 2, paint);
+    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+    canvas.drawBitmap(bitmap, rect, rect, paint);
+    //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+    //return _bmp;
+    return output;
+}
 
 }
 

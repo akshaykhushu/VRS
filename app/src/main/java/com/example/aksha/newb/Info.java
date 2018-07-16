@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.provider.Settings.Secure;
+import android.widget.Spinner;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -61,6 +62,9 @@ public class Info extends AppCompatActivity {
         EditText eT = findViewById(R.id.nameEditText);
         EditText eTdes = findViewById(R.id.editTextDescription);
         EditText eTcost = findViewById(R.id.editTextCost);
+        Spinner spinner = findViewById(R.id.spinnerCurrency);
+        String text = spinner.getSelectedItem().toString();
+        text = text + " ";
 
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
@@ -77,7 +81,7 @@ public class Info extends AppCompatActivity {
         databaseReference.child("LocationLati").setValue(String.valueOf(location.getLatitude()));
         databaseReference.child("Title").setValue(eT.getText().toString());
         databaseReference.child("Description").setValue(eTdes.getText().toString());
-        databaseReference.child("Cost").setValue(eTcost.getText().toString());
+        databaseReference.child("Cost").setValue(text + eTcost.getText().toString());
         MapsActivity.upload = 1;
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
