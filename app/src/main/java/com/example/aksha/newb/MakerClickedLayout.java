@@ -28,11 +28,11 @@ public class MakerClickedLayout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maker_clicked_layout);
 //        SGD = new ScaleGestureDetector(this, new ScaleListener());
-
         EditText eT = findViewById(R.id.editTextNameMarkerClicked);
         EditText eTdes = findViewById(R.id.editTextDescriptionMarkerClicked);
         EditText eTcost = findViewById(R.id.editTextCostMarkerClicked);
         imageView = findViewById(R.id.imageViewMarkerClicked);
+
         eT.setText(getIntent().getStringExtra("Title").toString());
         eTdes.setText(getIntent().getStringExtra("Description").toString());
         eTcost.setText(getIntent().getStringExtra("Cost").toString());

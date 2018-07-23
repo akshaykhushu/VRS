@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Info extends AppCompatActivity {
@@ -66,7 +67,7 @@ public class Info extends AppCompatActivity {
         String text = spinner.getSelectedItem().toString();
         text = text + " ";
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = getLastKnownLocation();
         android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
         DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
         ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
@@ -76,16 +77,44 @@ public class Info extends AppCompatActivity {
         Log.e("Longitude", String.valueOf(location.getLongitude()));
         Log.e("Latitude", String.valueOf(location.getLatitude()));
 
+//        MarkerInfo markerInfo = new MarkerInfo();
+//        markerInfo.setTitle(eT.getText().toString());
+//        markerInfo.setDescription(eTdes.getText().toString());
+//        markerInfo.setCost(eTcost.getText().toString());
+//        markerInfo.setBitmap(bitmap);
+//        markerInfo.setLongitude(String.valueOf(location.getLongitude()));
+//        markerInfo.setLatitude(String.valueOf(location.getLatitude()));
+//        markerInfo.setId(android_id);
+//        MapsActivity.markerInfoMap.put(android_id, markerInfo);
+
         databaseReference.child("Bitmap").setValue(temp);
         databaseReference.child("LocationLong").setValue(String.valueOf(location.getLongitude()));
         databaseReference.child("LocationLati").setValue(String.valueOf(location.getLatitude()));
         databaseReference.child("Title").setValue(eT.getText().toString());
         databaseReference.child("Description").setValue(eTdes.getText().toString());
         databaseReference.child("Cost").setValue(text + eTcost.getText().toString());
+        databaseReference.child("Id").setValue(android_id);
         MapsActivity.upload = 1;
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private Location getLastKnownLocation() {
+        locationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = locationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = locationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
 
 }

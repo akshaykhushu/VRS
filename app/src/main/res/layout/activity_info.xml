@@ -6,10 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".Info">
 
+
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="381dp"
-        android:layout_height="281dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="167dp"
+        android:layout_marginBottom="192dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
@@ -35,7 +36,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
         android:onClick="Upload"
         android:text="Upload" />
 
@@ -44,9 +44,9 @@
         android:layout_width="267dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/nameEditText"
-        android:layout_marginBottom="57dp"
-        android:layout_marginStart="41dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="55dp"
+        android:layout_marginEnd="34dp"
         android:ems="10"
         android:hint="Cost"
         android:inputType="numberDecimal" />
@@ -55,8 +55,9 @@
         android:id="@+id/spinnerCurrency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editTextCost"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/editTextCost"
+        android:layout_marginStart="11dp"
         android:entries="@array/currency"
         android:spinnerMode="dialog" />
 
@@ -66,8 +67,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="109dp"
         android:ems="10"
         android:hint="Description"
         android:inputType="textMultiLine" />
+
+
 </RelativeLayout>

@@ -25,5 +25,14 @@
         android:clickable="true"
         android:src="@android:drawable/ic_menu_camera" />
 
+    <Button
+        android:id="@+id/buttonListView"
+        android:onClick="ListView"
+        android:layout_width="61dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="List" />
+
 
 </RelativeLayout>

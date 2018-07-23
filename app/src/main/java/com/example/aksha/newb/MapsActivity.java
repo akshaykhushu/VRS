@@ -13,12 +13,15 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,14 +48,18 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -59,12 +67,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private Location currentLocation;
-    public static int upload=0;
+    public static int upload = 0;
     protected Bitmap bitmap, circularBitmap;
-    protected  String title;
-    protected  String description;
+    protected String title;
+    protected String description;
     protected String cost;
+    public static Map<String, MarkerInfo> markerInfoMap;
 
+    // Construct a FusedLocationProviderClient.
+    // mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference reference;
@@ -79,6 +90,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        markerInfoMap = new HashMap<>();
+        //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -96,7 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        try{
+        try {
             if (requestCode == 123) {
                 Bundle extras = data.getExtras();
                 bitmap = (Bitmap) extras.get("data");
@@ -106,7 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 finish();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 
@@ -135,130 +148,125 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         mMap.setMyLocationEnabled(true);
+
+        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
+        rlp.addRule(RelativeLayout.ALIGN_END, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        rlp.setMargins(30, 0, 0, 40);
     }
 
     @Override
     protected void onResume() {
+        //String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         super.onResume();
-        Log.w("onResume : ", String.valueOf(upload) );
-            reference = firebaseDatabase.getReference();
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        HashMap<String, Object> map = (HashMap) snapshot.getValue();
-                        Log.w("Title", snapshot.child("Title").getValue().toString());
-                        //Log.w("Bitmap", snapshot.child("Bitmap").getValue().toString());
-                        //Log.w("Location", snapshot.child("Location").getValue().toString());
-
-                        String longitude = snapshot.child("LocationLong").getValue().toString();
-                        String latitude = snapshot.child("LocationLati").getValue().toString();
-                        //HashMap<String, Object> map = new HashMap<>();
-                        byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
-                        Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-                        Log.w("Bitmap is : ", image.toString());
-                        bitmap = image;
-
-                        //bitmap = Bitmap.createBitmap((Bitmap)snapshot.child("Bitmap").getValue());
-                        title = snapshot.child("Title").getValue().toString();
-                        description = snapshot.child("Description").getValue().toString();
-                        cost = snapshot.child("Cost").getValue().toString();
-
-                        setMarker(longitude, latitude, bitmap, title, description, cost);
-                        //Log.w("Value from DB", image.toString());
-                    }
+        Log.w("onResume : ", String.valueOf(upload));
+        reference = firebaseDatabase.getReference();
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String longitude = snapshot.child("LocationLong").getValue().toString();
+                    String latitude = snapshot.child("LocationLati").getValue().toString();
+                    byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
+                    Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                    String android_id = snapshot.child("Id").getValue().toString();
+                    Log.w("Bitmap is : ", image.toString());
+                    bitmap = image;
+                    MarkerInfo markerInfo = new MarkerInfo();
+                    markerInfo.setDescription(snapshot.child("Description").getValue().toString());
+                    markerInfo.setCost(snapshot.child("Cost").getValue().toString());
+                    markerInfo.setBitmap(bitmap);
+                    markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
+                    markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
+                    markerInfo.setId(snapshot.child("Id").getValue().toString());
+                    markerInfo.setTitle(snapshot.child("Title").getValue().toString());
+                    MapsActivity.markerInfoMap.put(android_id, markerInfo);
+                    setMarker(markerInfo);
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.w("Value from DB", "OnCancelledCalled");
-                }
-            });
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("Value from DB", "OnCancelledCalled");
+            }
+        });
+    }
+
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = bitmap.getWidth();
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
+    }
+
+    public void ListView(View view){
+        Intent intent = new Intent(this, ListActivity.class);
+        startActivity(intent);
+    }
 
 
-    public void setMarker(String longitude, String latitude, final Bitmap bitmap, String Title, final String description, String costo) {
-        Log.w("Value from DB", "SetMarker chala");
-        Log.w("Image is : ", bitmap.toString());
+    public void setMarker(MarkerInfo markerInfo) {
 
-        Log.e("Longitude", longitude);
-        Log.e("Latitude", latitude);
-
-        LatLng current = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longitude));
-        circularBitmap = getCroppedBitmap(bitmap);
+        LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
+        circularBitmap = getRoundedCornerBitmap(markerInfo.getBitmap());
         BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
         BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
-        mMap.addMarker(new MarkerOptions().position(current).icon(bitmapDescriptor2).title(Title));
+        MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getTitle());
+        Marker marker = mMap.addMarker(mo);
+        marker.showInfoWindow();
+        markerInfoMap.put(marker.getId(), markerInfo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
-                byte [] b=ByteStream.toByteArray();
-                String temp= Base64.encodeToString(b, Base64.DEFAULT);
-                intent.putExtra("Bitmap",temp);
-                Log.e("Title marker clicked:  ", title);
-                Log.e("desc marker clicked:  ", description);
-                Log.e("cost marker clicked:  ", cost);
-                intent.putExtra("Title", title);
-                intent.putExtra("Description", description);
-                intent.putExtra("Cost", cost);
-                startActivity(intent);
+                String idMarker = marker.getId();
+                for (String id : markerInfoMap.keySet()) {
+                    if (id.equals(idMarker)){
+                        Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
+                        ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
+                        markerInfoMap.get(id).getBitmap().compress(Bitmap.CompressFormat.PNG, 100, ByteStream);
+                        byte[] b = ByteStream.toByteArray();
+                        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+                        intent.putExtra("Bitmap", temp);
+                        intent.putExtra("Title", markerInfoMap.get(id).getTitle());
+                        intent.putExtra("Description", markerInfoMap.get(id).getDescription());
+                        intent.putExtra("Cost", markerInfoMap.get(id).getCost());
+                        startActivity(intent);
+                    }
+                }
                 return true;
             }
         });
 
-        }
-
-
-//    public Bitmap createCustomMarker(Context context, String _name, Bitmap bitmap) {
-//
-//        View marker = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.markerlayout, null);
-//
-//        CircleImageView markerImage = (CircleImageView) marker.findViewById(R.id.user_dp);
-//        markerImage.setImageBitmap(bitmap);
-//        TextView txt_name = (TextView)marker.findViewById(R.id.name);
-//        txt_name.setText(_name);
-//
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        marker.setLayoutParams(new ViewGroup.LayoutParams(52, ViewGroup.LayoutParams.WRAP_CONTENT));
-//        marker.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-//        marker.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-//        marker.buildDrawingCache();
-//        Bitmap bitmap2= Bitmap.createBitmap(marker.getMeasuredWidth(), marker.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(bitmap2);
-//        marker.draw(canvas);
-//        ImageView imageView = findViewById(R.id.imageViewMarkerClicked);
-//
-//        return bitmap;
-//
-//    }
-public Bitmap getCroppedBitmap(Bitmap bitmap) {
-    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-            bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-    Canvas canvas = new Canvas(output);
-
-    final int color = 0xff424242;
-    final Paint paint = new Paint();
-    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-    paint.setAntiAlias(true);
-    canvas.drawARGB(0, 0, 0, 0);
-    paint.setColor(color);
-    // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-    canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
-            bitmap.getWidth() / 2, paint);
-    paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-    canvas.drawBitmap(bitmap, rect, rect, paint);
-    //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
-    //return _bmp;
-    return output;
+    }
 }
 
-}
+
+
+
 
 
