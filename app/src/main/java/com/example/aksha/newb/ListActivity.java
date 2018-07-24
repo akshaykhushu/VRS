@@ -37,7 +37,6 @@ public class ListActivity extends AppCompatActivity {
         listItems = new ArrayList<>(MapsActivity.markerInfoMap.values());
         CustomAdapter customAdapter = new CustomAdapter();
         listView.setAdapter(customAdapter);
-
     }
 
     class CustomAdapter extends BaseAdapter {
@@ -58,17 +57,16 @@ public class ListActivity extends AppCompatActivity {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            View view = getLayoutInflater().inflate(R.layout.listitem, null);
 
+            View view = getLayoutInflater().inflate(R.layout.listitem, null);
 
             ImageView imageView = view.findViewById(R.id.imageViewListItem);
             TextView textViewName = view.findViewById(R.id.textViewListItemName);
             TextView textViewCost = view.findViewById(R.id.textViewListItemCost);
 
-            Object[] markerInfos = MapsActivity.markerInfoMap.values().toArray();
-            imageView.setImageBitmap(((MarkerInfo)markerInfos[position]).getBitmap());
-            textViewName.setText(((MarkerInfo)markerInfos[position]).getTitle());
-            textViewCost.setText(((MarkerInfo)markerInfos[position]).getCost());
+            imageView.setImageBitmap(listItems.get(position).getBitmap());
+            textViewName.setText(listItems.get(position).getTitle());
+            textViewCost.setText(listItems.get(position).getCost());
             return view;
         }
     }

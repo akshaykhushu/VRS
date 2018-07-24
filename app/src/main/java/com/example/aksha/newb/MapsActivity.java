@@ -188,7 +188,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
                     markerInfo.setId(snapshot.child("Id").getValue().toString());
                     markerInfo.setTitle(snapshot.child("Title").getValue().toString());
-                    MapsActivity.markerInfoMap.put(android_id, markerInfo);
+                    if (!markerInfoMap.containsKey(android_id)){
+                        MapsActivity.markerInfoMap.put(android_id, markerInfo);
+                    }
                     setMarker(markerInfo);
                 }
             }
@@ -237,7 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getTitle());
         Marker marker = mMap.addMarker(mo);
         marker.showInfoWindow();
-        markerInfoMap.put(marker.getId(), markerInfo);
+        //markerInfoMap.put(marker.getId(), markerInfo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {

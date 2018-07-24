@@ -5,6 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/imageViewListItem"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/textViewListItemCost"
         android:layout_width="108dp"
@@ -12,6 +20,8 @@
         android:layout_alignBottom="@+id/textViewListItemName"
         android:layout_alignParentStart="true"
         android:layout_marginStart="20dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
         android:text="TextView" />
 
     <TextView
@@ -20,15 +30,10 @@
         android:layout_height="35dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="17dp"
-        android:layout_marginTop="165dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="101dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
         android:text="TextView" />
-
-    <ImageView
-        android:id="@+id/imageViewListItem"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
 
 </RelativeLayout>
