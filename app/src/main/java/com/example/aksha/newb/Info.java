@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Parcel;
@@ -45,7 +46,9 @@ public class Info extends AppCompatActivity {
         setContentView(R.layout.activity_info);
         bitmap = (Bitmap) getIntent().getParcelableExtra("Image");
         ImageView imageView = findViewById(R.id.imageView);
-        imageView.setImageBitmap(bitmap);
+        int nh = (int) ( bitmap.getHeight() * (1080.0 / bitmap.getWidth()) );
+        Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 1080, nh, true);
+        imageView.setImageBitmap(scaled);
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         map = new HashMap<>();
 
@@ -68,6 +71,7 @@ public class Info extends AppCompatActivity {
         text = text + " ";
 
         Location location = getLastKnownLocation();
+        MapsActivity.myLocation = location;
         android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
         DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
         ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
@@ -76,16 +80,6 @@ public class Info extends AppCompatActivity {
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
         Log.e("Longitude", String.valueOf(location.getLongitude()));
         Log.e("Latitude", String.valueOf(location.getLatitude()));
-
-//        MarkerInfo markerInfo = new MarkerInfo();
-//        markerInfo.setTitle(eT.getText().toString());
-//        markerInfo.setDescription(eTdes.getText().toString());
-//        markerInfo.setCost(eTcost.getText().toString());
-//        markerInfo.setBitmap(bitmap);
-//        markerInfo.setLongitude(String.valueOf(location.getLongitude()));
-//        markerInfo.setLatitude(String.valueOf(location.getLatitude()));
-//        markerInfo.setId(android_id);
-//        MapsActivity.markerInfoMap.put(android_id, markerInfo);
 
         databaseReference.child("Bitmap").setValue(temp);
         databaseReference.child("LocationLong").setValue(String.valueOf(location.getLongitude()));

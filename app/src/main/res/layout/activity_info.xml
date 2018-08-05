@@ -14,6 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
+        android:scaleType="centerCrop"
         tools:layout_editor_absoluteX="92dp"
         tools:layout_editor_absoluteY="62dp" />
 

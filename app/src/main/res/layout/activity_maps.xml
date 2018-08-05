@@ -13,6 +13,8 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         tools:context=".MapsActivity" />
 
     <android.support.design.widget.FloatingActionButton
@@ -25,14 +27,39 @@
         android:clickable="true"
         android:src="@android:drawable/ic_menu_camera" />
 
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="31dp"
+        android:layout_marginEnd="18dp"
+        android:src="@android:drawable/ic_popup_sync" />
+
     <Button
         android:id="@+id/buttonListView"
-        android:onClick="ListView"
-        android:layout_width="61dp"
+        android:layout_width="53dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        android:onClick="ListView"
         android:text="List" />
+
+    <EditText
+        android:id="@+id/editTextSearchBar"
+        android:layout_width="310dp"
+        android:layout_height="41dp"
+        android:layout_alignBottom="@+id/buttonListView"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="13dp"
+        android:background="@drawable/search_layout"
+        android:ems="10"
+        android:hint="Search"
+        android:inputType="textPersonName"
+        android:textColor="#999999"
+        android:textSize="16sp"
+        tools:fontFamily="@font/nunito_semibold" />
 
 
 </RelativeLayout>

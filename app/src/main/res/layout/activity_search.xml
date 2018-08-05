@@ -13,7 +13,7 @@
 
         <EditText
             android:id="@+id/editTextSearchBar"
-            android:layout_width="274dp"
+            android:layout_width="371dp"
             android:layout_height="41dp"
             android:layout_marginStart="13dp"
             android:background="@drawable/search_layout"
@@ -24,21 +24,14 @@
             android:textSize="16sp"
             tools:fontFamily="@font/nunito_semibold" />
 
-        <Button
-            android:id="@+id/buttonMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="MapView"
-            android:text="Map" />
-
     </LinearLayout>
 
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/dynamicList"
         android:layout_width="match_parent"
-        android:clickable="true"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:clickable="true" />
 
 </LinearLayout>

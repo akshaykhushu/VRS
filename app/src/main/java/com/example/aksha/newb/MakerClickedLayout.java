@@ -20,7 +20,7 @@ public class MakerClickedLayout extends AppCompatActivity {
 
     ImageView imageView;
     Bitmap image;
-//    Matrix matrix = new Matrix();
+    //    Matrix matrix = new Matrix();
 //    Float scale = 10f;
 //    ScaleGestureDetector SGD;
     @Override

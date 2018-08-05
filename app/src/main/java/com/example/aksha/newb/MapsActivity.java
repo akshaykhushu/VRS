@@ -18,7 +18,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -27,12 +30,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.FileProvider;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -58,7 +63,13 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -74,17 +85,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
 
-    // Construct a FusedLocationProviderClient.
-    // mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+    public static Location myLocation;
+
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference reference;
     LocationManager locationManager;
     LocationListener locationListener;
 
+    Uri photoURI;
+    String mCurrentPhotoPath;
     public void setCurrentLocation(Location current) {
         this.currentLocation = current;
     }
+    private static final int CONTENT_REQUEST=1337;
+    private File output=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +111,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
+        EditText et = findViewById(R.id.editTextSearchBar);
+        et.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, 123);
+
+
             }
         });
+
+
+        reference = firebaseDatabase.getReference();
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
+                    Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                    String android_id = snapshot.child("Id").getValue().toString();
+                    Log.w("Bitmap is : ", image.toString());
+                    bitmap = image;
+                    MarkerInfo markerInfo = new MarkerInfo();
+                    markerInfo.setDescription(snapshot.child("Description").getValue().toString());
+                    markerInfo.setCost(snapshot.child("Cost").getValue().toString());
+                    markerInfo.setBitmap(bitmap);
+                    markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
+                    markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
+                    markerInfo.setId(snapshot.child("Id").getValue().toString());
+                    markerInfo.setTitle(snapshot.child("Title").getValue().toString());
+                    if (!markerInfoMap.containsKey(android_id)){
+                        MapsActivity.markerInfoMap.put(android_id, markerInfo);
+                    }
+                    setMarker(markerInfo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("Value from DB", "OnCancelledCalled");
+            }
+        });
+
+
     }
 
     @Override
@@ -125,15 +187,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -163,44 +218,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rlp.setMargins(30, 0, 0, 40);
     }
 
-    @Override
-    protected void onResume() {
-        //String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        super.onResume();
-        Log.w("onResume : ", String.valueOf(upload));
-        reference = firebaseDatabase.getReference();
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String longitude = snapshot.child("LocationLong").getValue().toString();
-                    String latitude = snapshot.child("LocationLati").getValue().toString();
-                    byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
-                    Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-                    String android_id = snapshot.child("Id").getValue().toString();
-                    Log.w("Bitmap is : ", image.toString());
-                    bitmap = image;
-                    MarkerInfo markerInfo = new MarkerInfo();
-                    markerInfo.setDescription(snapshot.child("Description").getValue().toString());
-                    markerInfo.setCost(snapshot.child("Cost").getValue().toString());
-                    markerInfo.setBitmap(bitmap);
-                    markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
-                    markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
-                    markerInfo.setId(snapshot.child("Id").getValue().toString());
-                    markerInfo.setTitle(snapshot.child("Title").getValue().toString());
-                    if (!markerInfoMap.containsKey(android_id)){
-                        MapsActivity.markerInfoMap.put(android_id, markerInfo);
-                    }
-                    setMarker(markerInfo);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w("Value from DB", "OnCancelledCalled");
-            }
-        });
-    }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -236,7 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circularBitmap = getRoundedCornerBitmap(markerInfo.getBitmap());
         BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
         BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
-        MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getTitle());
+        MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
         Marker marker = mMap.addMarker(mo);
         marker.showInfoWindow();
         //markerInfoMap.put(marker.getId(), markerInfo);
@@ -245,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                String idMarker = marker.getId();
+                String idMarker = marker.getTitle();
                 for (String id : markerInfoMap.keySet()) {
                     if (id.equals(idMarker)){
                         Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
