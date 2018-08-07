@@ -9,5 +9,6 @@
         <item>¥</item>
         <item>£</item>
     </string-array>
+    <string name="title_activity_maps_search">Map</string>
 
 </resources>

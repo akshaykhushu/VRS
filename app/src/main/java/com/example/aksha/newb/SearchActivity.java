@@ -1,5 +1,6 @@
 package com.example.aksha.newb;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -32,6 +34,7 @@ import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -42,7 +45,10 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<String> titleList;
     ArrayList<String> costList;
     ArrayList<String> bitmapList;
+    ArrayList<String> descriptionList;
+    ArrayList<String> uidList;
     SearchAdapter searchAdapter;
+    public static HashMap<String, MarkerInfoSearch> hashMap;
 
 
     @Override
@@ -60,6 +66,9 @@ public class SearchActivity extends AppCompatActivity {
         titleList = new ArrayList<>();
         costList = new ArrayList<>();
         bitmapList = new ArrayList<>();
+        descriptionList = new ArrayList<>();
+        hashMap = new HashMap<>();
+
 
         searchField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -83,11 +92,19 @@ public class SearchActivity extends AppCompatActivity {
                     titleList.clear();
                     costList.clear();
                     bitmapList.clear();
+                    descriptionList.clear();
                     resultList.removeAllViews();
+                    hashMap.clear();
                 }
 
             }
         });
+    }
+
+    public void MapView(View view){
+        Intent intent = new Intent(this, MapsActivitySearch.class);
+        intent.putExtra("Search", searchField.getText().toString());
+        startActivity(intent);
     }
 
     private void setAdapter(final String searchedString) {
@@ -102,6 +119,8 @@ public class SearchActivity extends AppCompatActivity {
                 titleList.clear();
                 costList.clear();
                 bitmapList.clear();
+                descriptionList.clear();
+                hashMap.clear();
                 resultList.removeAllViews();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
@@ -110,24 +129,44 @@ public class SearchActivity extends AppCompatActivity {
                     String cost = snapshot.child("Cost").getValue(String.class);
                     String bitmap = snapshot.child("Bitmap").getValue(String.class);
                     String description = snapshot.child("Description").getValue(String.class);
+                    String longitude = snapshot.child("LocationLong").getValue(String.class);
+                    String latitude = snapshot.child("LocationLati").getValue(String.class);
+                    String id = snapshot.child("Id").getValue(String.class);
+
+
+
+                    byte[] encodeByte = Base64.decode(bitmap, Base64.DEFAULT);
+                    MarkerInfoSearch markerInfoSearch = new MarkerInfoSearch();
+                    Bitmap imageB = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                    markerInfoSearch.setBitmap(imageB);
+                    markerInfoSearch.setTitle(title);
+                    markerInfoSearch.setDescription(description);
+                    markerInfoSearch.setLatitude(latitude);
+                    markerInfoSearch.setLongitude(longitude);
+                    markerInfoSearch.setCost(cost);
+                    markerInfoSearch.setId(id);
 
                     if(title.toLowerCase().contains(searchedString.toLowerCase())){
                         titleList.add(title);
                         costList.add(cost);
                         bitmapList.add(bitmap);
+                        descriptionList.add(description);
+                        hashMap.put(id, markerInfoSearch);
                         counter++;
                     }else if (description.toLowerCase().contains(searchedString.toLowerCase())){
                         titleList.add(title);
                         costList.add(cost);
                         bitmapList.add(bitmap);
+                        descriptionList.add(description);
+                        hashMap.put(id, markerInfoSearch);
                         counter++;
                     }
 
-                    if(counter == 15)
+                    if(counter == 30)
                         break;
                 }
 
-                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList);
+                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList, descriptionList, uidList);
                 resultList.setAdapter(searchAdapter);
 
             }

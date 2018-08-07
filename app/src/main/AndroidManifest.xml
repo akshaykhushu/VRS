@@ -58,6 +58,9 @@
         <activity android:name=".FullImageView" />
         <activity android:name=".ListActivity" />
         <activity android:name=".SearchActivity" />
+        <activity
+            android:name=".MapsActivitySearch"
+            android:label="@string/title_activity_maps_search"></activity>
     </application>
 
 </manifest>

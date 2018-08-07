@@ -28,13 +28,14 @@
 
             <EditText
                 android:id="@+id/editTextNameMarkerClicked"
-                android:layout_width="238dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="25dp"
                 android:background="@android:color/transparent"
                 android:capitalize="words"
                 android:editable="false"
+                android:autoSizeTextType="uniform"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
@@ -49,6 +50,7 @@
                 android:id="@+id/editTextCostMarkerClicked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
                 android:background="@android:color/transparent"
                 android:layout_gravity="left"
                 android:layout_marginTop="10dp"
@@ -64,8 +66,9 @@
 
             <EditText
                 android:id="@+id/editTextDescriptionMarkerClicked"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="10dp"
                 android:focusable="false"
