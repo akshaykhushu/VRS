@@ -72,7 +72,7 @@ public class Info extends AppCompatActivity {
 
         Location location = getLastKnownLocation();
         MapsActivity.myLocation = location;
-        android_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        android_id = MapsActivity.UserId;
         DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
         ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);

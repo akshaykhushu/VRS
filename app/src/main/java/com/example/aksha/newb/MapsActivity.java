@@ -85,16 +85,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
 
+    public static String UserId;
+
     public static Location myLocation;
 
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference reference;
-    LocationManager locationManager;
-    LocationListener locationListener;
-
-    Uri photoURI;
-    String mCurrentPhotoPath;
     public void setCurrentLocation(Location current) {
         this.currentLocation = current;
     }
@@ -110,6 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        UserId = getIntent().getStringExtra("UserId");
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
         EditText et = findViewById(R.id.editTextSearchBar);
         et.setOnClickListener(new View.OnClickListener() {
@@ -140,21 +138,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
                     Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-                    String android_id = snapshot.child("Id").getValue().toString();
-                    Log.w("Bitmap is : ", image.toString());
-                    bitmap = image;
+
                     MarkerInfo markerInfo = new MarkerInfo();
-                    markerInfo.setDescription(snapshot.child("Description").getValue().toString());
-                    markerInfo.setCost(snapshot.child("Cost").getValue().toString());
-                    markerInfo.setBitmap(bitmap);
-                    markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
-                    markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
-                    markerInfo.setId(snapshot.child("Id").getValue().toString());
-                    markerInfo.setTitle(snapshot.child("Title").getValue().toString());
-                    if (!markerInfoMap.containsKey(android_id)){
-                        MapsActivity.markerInfoMap.put(android_id, markerInfo);
+                    String userId = new String();
+                    try {
+                        userId = snapshot.child("Id").getValue().toString();
+
+                        Log.w("Bitmap is : ", image.toString());
+                        bitmap = image;
+                        markerInfo.setDescription(snapshot.child("Description").getValue().toString());
+                        markerInfo.setCost(snapshot.child("Cost").getValue().toString());
+                        markerInfo.setBitmap(bitmap);
+                        markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
+                        markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
+                        markerInfo.setId(snapshot.child("Id").getValue().toString());
+                        markerInfo.setTitle(snapshot.child("Title").getValue().toString());
+                        if (!markerInfoMap.containsKey(userId)){
+                            MapsActivity.markerInfoMap.put(userId, markerInfo);
+                        }
+                        setMarker(markerInfo);
+                    }catch(Exception e){
+                        Log.e("Exception Caught","UserId Not found");
                     }
-                    setMarker(markerInfo);
                 }
             }
 
@@ -255,7 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
         MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
         Marker marker = mMap.addMarker(mo);
-        marker.showInfoWindow();
+//        marker.showInfoWindow();
         //markerInfoMap.put(marker.getId(), markerInfo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
