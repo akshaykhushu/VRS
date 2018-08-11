@@ -37,6 +37,7 @@
                 android:autoSizeTextType="uniform"
                 android:editable="false"
                 android:fontFamily="sans-serif-smallcaps"
+                android:gravity="center"
                 android:text="Name"
                 android:textSize="32sp" />
 

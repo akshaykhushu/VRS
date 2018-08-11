@@ -46,6 +46,7 @@ public class ListActivity extends AppCompatActivity {
         listView = findViewById(R.id.dynamicList);
         listItems = new ArrayList<>(MapsActivity.markerInfoMap.values());
         EditText et = findViewById(R.id.editTextSearchBar);
+        et.setFocusableInTouchMode(true);
         et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

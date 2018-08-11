@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/holo_orange_light"
+    android:layout_height="match_parent"
+    tools:context=".SplashActivity">
+
+    <ImageView
+        android:id="@+id/imageViewAppLogo"
+        android:layout_width="141dp"
+        android:layout_height="117dp"
+        android:layout_centerInParent="true"
+        app:srcCompat="@android:drawable/ic_menu_mapmode" />
+</RelativeLayout>

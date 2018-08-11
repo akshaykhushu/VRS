@@ -20,11 +20,13 @@
 
     <EditText
         android:id="@+id/nameEditText"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="192dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
@@ -41,37 +43,50 @@
         android:text="Upload" />
 
     <EditText
-        android:id="@+id/editTextCost"
-        android:layout_width="267dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="55dp"
-        android:layout_marginEnd="34dp"
-        android:ems="10"
-        android:hint="Cost"
-        android:inputType="numberDecimal" />
-
-    <Spinner
-        android:id="@+id/spinnerCurrency"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editTextCost"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="11dp"
-        android:entries="@array/currency"
-        android:spinnerMode="dialog" />
-
-    <EditText
         android:id="@+id/editTextDescription"
-        android:layout_width="299dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="109dp"
+        android:layout_marginBottom="134dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:ems="10"
         android:hint="Description"
-        android:inputType="textMultiLine" />
+        android:inputType="text" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="75dp"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spinnerCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/editTextCost"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="11dp"
+            android:entries="@array/currency"
+            android:spinnerMode="dialog" />
+
+        <EditText
+            android:id="@+id/editTextCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:ems="10"
+            android:hint="Cost"
+            android:inputType="numberDecimal" />
+
+    </LinearLayout>
 
 
 </RelativeLayout>
