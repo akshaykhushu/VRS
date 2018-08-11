@@ -8,13 +8,14 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="41dp"
+        android:layout_height="50dp"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/editTextSearchBar"
-            android:layout_width="293dp"
-            android:layout_height="41dp"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
             android:layout_marginStart="13dp"
             android:background="@drawable/search_layout"
             android:ems="10"
@@ -27,8 +28,8 @@
         <Button
             android:id="@+id/buttonMapView"
             android:onClick="MapView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Map" />
 

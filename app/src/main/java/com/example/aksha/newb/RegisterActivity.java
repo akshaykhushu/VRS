@@ -14,13 +14,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
     EditText email;
     EditText password;
     Button signUp;
-    private FirebaseAuth firebaseAuth;
+    FirebaseAuth firebaseAuth;
     String userId;
 
     @Override
@@ -61,15 +62,36 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Registered Successfully", Toast.LENGTH_SHORT).show();
-                    finish();
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    userId =  firebaseAuth.getCurrentUser().getUid();
-                    intent.putExtra("UserId", userId);
-                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(), "An Email has been sent to your email id. Pls verify your email.", Toast.LENGTH_SHORT).show();
+//                    finish();
+//                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+//                    userId =  firebaseAuth.getCurrentUser().getUid();
+//                    intent.putExtra("UserId", userId);
+//                    startActivity(intent);
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Could Not Register. Try Again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        firebaseAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if (firebaseUser != null) {
+                    firebaseUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                finish();
+                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                                userId =  firebaseUser.getUid();
+//                                intent.putExtra("UserId", userId);
+                                startActivity(intent);
+                            }
+                        }
+                    });
                 }
             }
         });

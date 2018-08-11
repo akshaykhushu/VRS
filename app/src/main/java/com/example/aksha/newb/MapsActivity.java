@@ -27,14 +27,18 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -54,6 +58,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +79,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
     private Location currentLocation;
@@ -88,6 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String UserId;
 
     public static Location myLocation;
+    private FirebaseAuth firebaseAuth;
 
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -103,12 +109,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         markerInfoMap = new HashMap<>();
+        firebaseAuth = FirebaseAuth.getInstance();
         //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        setNavigationViewListner();
         UserId = getIntent().getStringExtra("UserId");
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
+        NavigationView navigationView =  findViewById(R.id.navigation_view);
+        View hView =  navigationView.getHeaderView(0);
+        ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
+        try{
+            user_nav_image.setImageURI(firebaseAuth.getCurrentUser().getPhotoUrl());
+        }
+        catch(NullPointerException e){
+            Log.e("User Has no image", e.getLocalizedMessage());
+            user_nav_image.setImageResource(R.drawable.ic_launcher_foreground);
+        }
+        TextView nav_user = hView.findViewById(R.id.textViewUserId);
+        nav_user.setText(firebaseAuth.getCurrentUser().getEmail());
         EditText et = findViewById(R.id.editTextSearchBar);
         et.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rlp.addRule(RelativeLayout.ALIGN_PARENT_END, 0);
         rlp.addRule(RelativeLayout.ALIGN_END, 0);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        rlp.setMargins(30, 0, 0, 40);
+        rlp.setMargins(100, 0, 0, 200);
     }
 
 
@@ -279,6 +299,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         intent.putExtra("Title", markerInfoMap.get(id).getTitle());
                         intent.putExtra("Description", markerInfoMap.get(id).getDescription());
                         intent.putExtra("Cost", markerInfoMap.get(id).getCost());
+                        intent.putExtra("Longitude", markerInfoMap.get(id).getLongitude());
+                        intent.putExtra("Latitude", markerInfoMap.get(id).getLatitude());
                         startActivity(intent);
                     }
                 }
@@ -286,6 +308,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
+
+    private void setNavigationViewListner() {
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.nav_MyAccount: {
+                Intent intent = new Intent(getApplicationContext(), AccountSettings.class);
+                startActivity(intent);
+                break;
+            }
+
+            case R.id.nav_Images: {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, 123);
+                break;
+            }
+
+            case R.id.nav_ListView :{
+                Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+                startActivity(intent);
+                break;
+            }
+
+            case R.id.nav_LogOut  :{
+                firebaseAuth.signOut();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                break;
+            }
+        }
+
+
+        DrawerLayout drawerLayout = findViewById(R.id.drwaerLayout);
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        return true;
     }
 }
 

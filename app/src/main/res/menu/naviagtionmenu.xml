@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_MyAccount"
+        android:title="My Account" />
+
+    <item
+        android:id="@+id/nav_Images"
+        android:title="Take a new Image" />
+
+    <item
+        android:id="@+id/nav_ListView"
+        android:title="ListView" />
+
+    <item
+        android:id="@+id/nav_LogOut"
+        android:title="Log out" />
+</menu>

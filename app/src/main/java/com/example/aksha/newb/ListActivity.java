@@ -69,6 +69,8 @@ public class ListActivity extends AppCompatActivity {
                 intent.putExtra("Title",listItems.get(position).getTitle());
                 intent.putExtra("Description", listItems.get(position).getDescription());
                 intent.putExtra("Cost",listItems.get(position).getCost());
+                intent.putExtra("Longitude", listItems.get(position).getLongitude());
+                intent.putExtra("Latitude", listItems.get(position).getLatitude());
                 startActivity(intent);
             }
         });
