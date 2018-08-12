@@ -4,7 +4,7 @@ package com.example.aksha.newb;
 import android.graphics.Bitmap;
 
 class MarkerInfo {
-    Bitmap bitmap;
+    String bitmapUrl;
     String cost;
     String description;
     String longitude;
@@ -28,12 +28,12 @@ class MarkerInfo {
         this.id = id;
     }
 
-    public Bitmap getBitmap() {
-        return bitmap;
+    public String getBitmapUrl() {
+        return bitmapUrl;
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+    public void setBitmapUrl(String bitmapUrl) {
+        this.bitmapUrl = bitmapUrl;
     }
 
     public String getCost() {

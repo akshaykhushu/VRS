@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
@@ -60,10 +62,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         holder.textViewName.setText(titleList.get(position));
         holder.textViewCost.setText(costList.get(position));
 
-        byte[] encodeByte = Base64.decode(bitmapList.get(position), Base64.DEFAULT);
-        Bitmap imageB = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-
-        holder.imageView.setImageBitmap(imageB);
+        Picasso.with(context).load(bitmapList.get(position)).into(holder.imageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

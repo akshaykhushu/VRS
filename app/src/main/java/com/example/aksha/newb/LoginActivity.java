@@ -190,17 +190,22 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    try{
-                        Toast.makeText(getApplicationContext(), "Welcome " + firebaseAuth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+                    if (firebaseAuth.getCurrentUser().isEmailVerified()) {
+                        try{
+                            Toast.makeText(getApplicationContext(), "Welcome " + firebaseAuth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+                        }
+                        catch(NullPointerException e){
+                            Toast.makeText(getApplicationContext(), "Welcome " + firebaseAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+                        }
+                        finish();
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        userId =  firebaseAuth.getCurrentUser().getUid();
+                        intent.putExtra("UserId", userId);
+                        startActivity(intent);
                     }
-                    catch(NullPointerException e){
-                        Toast.makeText(getApplicationContext(), "Welcome " + firebaseAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+                    else{
+                        Toast.makeText(getApplicationContext(), "Please verify your email", Toast.LENGTH_SHORT).show();
                     }
-                    finish();
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                    userId =  firebaseAuth.getCurrentUser().getUid();
-                    intent.putExtra("UserId", userId);
-                    startActivity(intent);
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Incorrect UserName or Password", Toast.LENGTH_SHORT).show();

@@ -35,27 +35,38 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"
+            android:background="@android:color/white"
             android:layout_height="50dp">
 
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@android:drawable/alert_dark_frame" />
 
             <EditText
                 android:id="@+id/editTextSearchBar"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="5"
+                android:layout_height="40dp"
+                android:layout_weight="7"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
                 android:layout_marginStart="13dp"
-                android:background="@android:color/white"
+                android:background="@drawable/search_layout"
                 android:ems="10"
                 android:hint="Search"
                 android:inputType="textPersonName"
-                android:textColor="#999999"
+                android:textColor="@android:color/black"
                 android:textSize="16sp"
                 tools:fontFamily="@font/nunito_semibold" />
 
             <Button
                 android:id="@+id/buttonListView"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"

@@ -117,14 +117,13 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
                 for (String id : SearchActivity.hashMap.keySet()) {
                     if (id.equals(idMarker)) {
                         Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                        ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
-                        SearchActivity.hashMap.get(id).getBitmap().compress(Bitmap.CompressFormat.PNG, 100, ByteStream);
-                        byte[] b = ByteStream.toByteArray();
-                        String temp = Base64.encodeToString(b, Base64.DEFAULT);
-                        intent.putExtra("Bitmap", temp);
+                        intent.putExtra("Bitmap", SearchActivity.hashMap.get(id).getBitmapUrl());
                         intent.putExtra("Title", SearchActivity.hashMap.get(id).getTitle());
                         intent.putExtra("Description", SearchActivity.hashMap.get(id).getDescription());
                         intent.putExtra("Cost", SearchActivity.hashMap.get(id).getCost());
+                        intent.putExtra("Latitude", SearchActivity.hashMap.get(id).getLatitude());
+                        intent.putExtra("Longitude", SearchActivity.hashMap.get(id).getLongitude());
+                        intent.putExtra("Id", SearchActivity.hashMap.get(id).getId());
                         startActivity(intent);
                     }
                 }

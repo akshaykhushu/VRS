@@ -133,12 +133,8 @@ public class SearchActivity extends AppCompatActivity {
                     String latitude = snapshot.child("LocationLati").getValue(String.class);
                     String id = snapshot.child("Id").getValue(String.class);
 
-
-
-                    byte[] encodeByte = Base64.decode(bitmap, Base64.DEFAULT);
                     MarkerInfoSearch markerInfoSearch = new MarkerInfoSearch();
-                    Bitmap imageB = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-                    markerInfoSearch.setBitmap(imageB);
+                    markerInfoSearch.setBitmapUrl(bitmap);
                     markerInfoSearch.setTitle(title);
                     markerInfoSearch.setDescription(description);
                     markerInfoSearch.setLatitude(latitude);

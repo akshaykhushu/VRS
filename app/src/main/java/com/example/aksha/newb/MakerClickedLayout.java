@@ -1,10 +1,12 @@
 package com.example.aksha.newb;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -15,8 +17,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 
 public class MakerClickedLayout extends AppCompatActivity {
@@ -25,6 +36,10 @@ public class MakerClickedLayout extends AppCompatActivity {
     Bitmap image;
     String longitude;
     String latitude;
+    String imageUrl;
+    String id;
+    StorageReference storageReference;
+    File outputFile;
     //    Matrix matrix = new Matrix();
 //    Float scale = 10f;
 //    ScaleGestureDetector SGD;
@@ -43,9 +58,19 @@ public class MakerClickedLayout extends AppCompatActivity {
         eTcost.setText(getIntent().getStringExtra("Cost").toString());
         latitude = getIntent().getStringExtra("Latitude").toString();
         longitude = getIntent().getStringExtra("Longitude").toString();
-        byte[] encodeByte = Base64.decode(getIntent().getStringExtra("Bitmap"), Base64.DEFAULT);
-        image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-        imageView.setImageBitmap(image);
+        imageUrl = getIntent().getStringExtra("Bitmap").toString();
+        id = getIntent().getStringExtra("Id").toString();
+
+        storageReference = FirebaseStorage.getInstance().getReference(id);
+        StorageReference url = storageReference.child("Image");
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Please Wait");
+        progressDialog.setMessage("Loading");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        Picasso.with(MakerClickedLayout.this).load(Uri.parse(imageUrl)).into(imageView);
+        progressDialog.dismiss();
 
         ImageButton imageButton = findViewById(R.id.buttonDirections);
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -63,11 +88,7 @@ public class MakerClickedLayout extends AppCompatActivity {
 
     public void FullScreen(View view){
         Intent intent = new Intent(this, FullImageView.class);
-        ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
-        byte [] b=ByteStream.toByteArray();
-        String temp= Base64.encodeToString(b, Base64.DEFAULT);
-        intent.putExtra("image", temp);
+        intent.putExtra("image", imageUrl);
         startActivity(intent);
     }
 

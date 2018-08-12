@@ -1,8 +1,12 @@
 package com.example.aksha.newb;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -17,14 +21,22 @@ import android.widget.AdapterView;
 import com.example.aksha.newb.*;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ListActivity extends AppCompatActivity {
@@ -33,6 +45,17 @@ public class ListActivity extends AppCompatActivity {
     ArrayList<MarkerInfo> listItems;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference reference;
+    File outputFile;
+    ImageView imageView;
+    private StorageReference storageReference;
+    Context currentContext;
+    ProgressDialog progressDialog;
+    StorageReference url;
+    File outpurtDir;
+    int selected;
+    TextView textViewName;
+    TextView textViewCost;
+    View view;
 
     public void MapView(View view){
         Intent intent = new Intent(this, MapsActivity.class);
@@ -54,7 +77,7 @@ public class ListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        currentContext = getApplicationContext();
         CustomAdapter customAdapter = new CustomAdapter();
         listView.setAdapter(customAdapter);
         listView.setItemsCanFocus(false);
@@ -62,16 +85,13 @@ public class ListActivity extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> adapter, View view, int position, long arg) {
                 Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
-                listItems.get(position).getBitmap().compress(Bitmap.CompressFormat.PNG, 100, ByteStream);
-                byte[] b = ByteStream.toByteArray();
-                String temp = Base64.encodeToString(b, Base64.DEFAULT);
-                intent.putExtra("Bitmap", temp);
+                intent.putExtra("Bitmap", listItems.get(position).getBitmapUrl());
                 intent.putExtra("Title",listItems.get(position).getTitle());
                 intent.putExtra("Description", listItems.get(position).getDescription());
                 intent.putExtra("Cost",listItems.get(position).getCost());
                 intent.putExtra("Longitude", listItems.get(position).getLongitude());
                 intent.putExtra("Latitude", listItems.get(position).getLatitude());
+                intent.putExtra("Id", listItems.get(position).getId());
                 startActivity(intent);
             }
         });
@@ -97,14 +117,11 @@ public class ListActivity extends AppCompatActivity {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-
-            View view = getLayoutInflater().inflate(R.layout.listitem, null);
-
-            ImageView imageView = view.findViewById(R.id.imageViewListItem);
-            TextView textViewName = view.findViewById(R.id.textViewListItemName);
-            TextView textViewCost = view.findViewById(R.id.textViewListItemCost);
-
-            imageView.setImageBitmap(listItems.get(position).getBitmap());
+            view = getLayoutInflater().inflate(R.layout.listitem, null);
+            imageView = view.findViewById(R.id.imageViewListItem);
+            textViewName = view.findViewById(R.id.textViewListItemName);
+            textViewCost = view.findViewById(R.id.textViewListItemCost);
+            Picasso.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl())).into(imageView);
             textViewName.setText(listItems.get(position).getTitle());
             textViewCost.setText(listItems.get(position).getCost());
             return view;

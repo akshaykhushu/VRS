@@ -42,6 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -64,6 +65,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -92,8 +95,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public static String UserId;
 
+    Uri imageUri;
+    StorageReference storageReference;
+
     public static Location myLocation;
     private FirebaseAuth firebaseAuth;
+    ImageButton imgNavButton;
 
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -117,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setNavigationViewListner();
         UserId = getIntent().getStringExtra("UserId");
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
-        NavigationView navigationView =  findViewById(R.id.navigation_view);
+        final NavigationView navigationView =  findViewById(R.id.navigation_view);
         View hView =  navigationView.getHeaderView(0);
         ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
         try{
@@ -130,6 +137,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         TextView nav_user = hView.findViewById(R.id.textViewUserId);
         nav_user.setText(firebaseAuth.getCurrentUser().getEmail());
         EditText et = findViewById(R.id.editTextSearchBar);
+
+        imgNavButton = findViewById(R.id.imageButton);
+        imgNavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawerLayout drawerLayout = findViewById(R.id.drwaerLayout);
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,15 +154,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.INTERNET, Manifest.permission.CAMERA
+            }, 200);
+            return;
+        }
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                String filename = Environment.getExternalStorageDirectory().getPath() + "/test/testfile.jpg";
+                imageUri = Uri.fromFile(new File(filename));
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(cameraIntent, 123);
-
-
             }
         });
 
@@ -156,19 +180,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    byte[] encodeByte = Base64.decode(snapshot.child("Bitmap").getValue().toString(), Base64.DEFAULT);
-                    Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-
                     MarkerInfo markerInfo = new MarkerInfo();
                     String userId = new String();
                     try {
                         userId = snapshot.child("Id").getValue().toString();
-
-                        Log.w("Bitmap is : ", image.toString());
-                        bitmap = image;
+                        markerInfo.setBitmapUrl(snapshot.child("Bitmap").getValue().toString());
                         markerInfo.setDescription(snapshot.child("Description").getValue().toString());
                         markerInfo.setCost(snapshot.child("Cost").getValue().toString());
-                        markerInfo.setBitmap(bitmap);
                         markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
                         markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
                         markerInfo.setId(snapshot.child("Id").getValue().toString());
@@ -198,11 +216,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             if (requestCode == 123) {
-                Bundle extras = data.getExtras();
-                bitmap = (Bitmap) extras.get("data");
-
+//                Bundle extras = data.getExtras();
+//                bitmap = (Bitmap) extras.get("data");
+//                ImageView img =  findViewById(R.id.image);
+//                img.setImageURI(imageUri);
                 Intent intent = new Intent(this, Info.class);
-                intent.putExtra("Image", bitmap);
+
+                intent.putExtra("Image", imageUri.toString());
                 startActivity(intent);
                 finish();
             }
@@ -275,13 +295,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setMarker(MarkerInfo markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
-        circularBitmap = getRoundedCornerBitmap(markerInfo.getBitmap());
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-        BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
         MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
         Marker marker = mMap.addMarker(mo);
-//        marker.showInfoWindow();
-        //markerInfoMap.put(marker.getId(), markerInfo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -292,13 +307,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (id.equals(idMarker)){
                         Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
                         ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
-                        markerInfoMap.get(id).getBitmap().compress(Bitmap.CompressFormat.PNG, 100, ByteStream);
-                        byte[] b = ByteStream.toByteArray();
-                        String temp = Base64.encodeToString(b, Base64.DEFAULT);
-                        intent.putExtra("Bitmap", temp);
+                        intent.putExtra("Bitmap", markerInfoMap.get(id).getBitmapUrl());
                         intent.putExtra("Title", markerInfoMap.get(id).getTitle());
                         intent.putExtra("Description", markerInfoMap.get(id).getDescription());
                         intent.putExtra("Cost", markerInfoMap.get(id).getCost());
+                        intent.putExtra("Id", markerInfoMap.get(id).getId());
                         intent.putExtra("Longitude", markerInfoMap.get(id).getLongitude());
                         intent.putExtra("Latitude", markerInfoMap.get(id).getLatitude());
                         startActivity(intent);
@@ -340,15 +353,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.nav_LogOut  :{
                 firebaseAuth.signOut();
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                finish();
                 startActivity(intent);
                 break;
             }
         }
 
-
         DrawerLayout drawerLayout = findViewById(R.id.drwaerLayout);
         drawerLayout.closeDrawer(GravityCompat.START);
-
         return true;
     }
 }

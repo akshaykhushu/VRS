@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -12,6 +13,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 public class FullImageView extends AppCompatActivity {
     ImageView imageView;
@@ -29,17 +34,17 @@ public class FullImageView extends AppCompatActivity {
     PointF mid = new PointF();
     double oldDist = 1f;
     String savedItemClicked;
+    String outputFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_image_view);
+        outputFile = getIntent().getStringExtra("image");
         imageView = findViewById(R.id.imageViewFullScreen);
-        byte[] encodeByte = Base64.decode(getIntent().getStringExtra("image"), Base64.DEFAULT);
-        Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-        imageView.setImageBitmap(image);
+        Picasso.with(FullImageView.this).load(Uri.parse(outputFile)).into(imageView);
         matrix = imageView.getImageMatrix();
-        matrix.setScale(5f, 5f);
+        matrix.setScale(1f, 1f);
         imageView.setImageMatrix(matrix);
         savedMatrix = imageView.getImageMatrix();
     }
