@@ -3,14 +3,25 @@ package com.example.aksha.newb;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 class MarkerInfo {
-    String bitmapUrl;
+    ArrayList<String> bitmapUrl;
     String cost;
     String description;
     String longitude;
     String latitude;
     String id;
     String title;
+    Integer totalImages;
+
+    public Integer getTotalImages() {
+        return totalImages;
+    }
+
+    public void setTotalImages(Integer totalImages) {
+        this.totalImages = totalImages;
+    }
 
     public String getTitle() {
         return title;
@@ -28,11 +39,11 @@ class MarkerInfo {
         this.id = id;
     }
 
-    public String getBitmapUrl() {
+    public ArrayList<String> getBitmapUrl() {
         return bitmapUrl;
     }
 
-    public void setBitmapUrl(String bitmapUrl) {
+    public void setBitmapUrl(ArrayList<String> bitmapUrl) {
         this.bitmapUrl = bitmapUrl;
     }
 

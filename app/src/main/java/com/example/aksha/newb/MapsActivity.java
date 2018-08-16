@@ -75,6 +75,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -181,10 +182,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MarkerInfo markerInfo = new MarkerInfo();
+                    ArrayList<String> bitmapUrl = new ArrayList<>();
                     String userId = new String();
                     try {
                         userId = snapshot.child("Id").getValue().toString();
-                        markerInfo.setBitmapUrl(snapshot.child("Bitmap").getValue().toString());
+                        markerInfo.setTotalImages(Integer.parseInt(snapshot.child("TotalImages").getValue().toString()));
+                        for (int i=0; i < markerInfo.getTotalImages(); i++){
+                            bitmapUrl.add(snapshot.child("Bitmap"+i).getValue().toString());
+                        }
+                        markerInfo.setBitmapUrl(bitmapUrl);
                         markerInfo.setDescription(snapshot.child("Description").getValue().toString());
                         markerInfo.setCost(snapshot.child("Cost").getValue().toString());
                         markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
@@ -215,13 +221,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onActivityResult(requestCode, resultCode, data);
 
         try {
-            if (requestCode == 123) {
+            if (resultCode == RESULT_OK) {
 //                Bundle extras = data.getExtras();
 //                bitmap = (Bitmap) extras.get("data");
 //                ImageView img =  findViewById(R.id.image);
 //                img.setImageURI(imageUri);
                 Intent intent = new Intent(this, Info.class);
-
                 intent.putExtra("Image", imageUri.toString());
                 startActivity(intent);
                 finish();
@@ -306,8 +311,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for (String id : markerInfoMap.keySet()) {
                     if (id.equals(idMarker)){
                         Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                        ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
-                        intent.putExtra("Bitmap", markerInfoMap.get(id).getBitmapUrl());
+                        intent.putExtra("TotalImages", markerInfoMap.get(id).getTotalImages());
+                        intent.putStringArrayListExtra("Bitmap", markerInfoMap.get(id).getBitmapUrl());
                         intent.putExtra("Title", markerInfoMap.get(id).getTitle());
                         intent.putExtra("Description", markerInfoMap.get(id).getDescription());
                         intent.putExtra("Cost", markerInfoMap.get(id).getCost());

@@ -121,7 +121,7 @@ public class ListActivity extends AppCompatActivity {
             imageView = view.findViewById(R.id.imageViewListItem);
             textViewName = view.findViewById(R.id.textViewListItemName);
             textViewCost = view.findViewById(R.id.textViewListItemCost);
-            Picasso.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl())).into(imageView);
+            Picasso.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl().get(0))).into(imageView);
             textViewName.setText(listItems.get(position).getTitle());
             textViewCost.setText(listItems.get(position).getCost());
             return view;

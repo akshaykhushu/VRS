@@ -47,6 +47,8 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<String> bitmapList;
     ArrayList<String> descriptionList;
     ArrayList<String> uidList;
+    ArrayList<String> latiList;
+    ArrayList<String> longList;
     SearchAdapter searchAdapter;
     public static HashMap<String, MarkerInfoSearch> hashMap;
 
@@ -68,6 +70,9 @@ public class SearchActivity extends AppCompatActivity {
         bitmapList = new ArrayList<>();
         descriptionList = new ArrayList<>();
         hashMap = new HashMap<>();
+        latiList = new ArrayList<>();
+        longList = new ArrayList<>();
+        uidList = new ArrayList<>();
 
 
         searchField.addTextChangedListener(new TextWatcher() {
@@ -93,6 +98,8 @@ public class SearchActivity extends AppCompatActivity {
                     costList.clear();
                     bitmapList.clear();
                     descriptionList.clear();
+                    latiList.clear();
+                    longList.clear();
                     resultList.removeAllViews();
                     hashMap.clear();
                 }
@@ -120,11 +127,12 @@ public class SearchActivity extends AppCompatActivity {
                 costList.clear();
                 bitmapList.clear();
                 descriptionList.clear();
+                latiList.clear();
+                longList.clear();
                 hashMap.clear();
                 resultList.removeAllViews();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    String uid = snapshot.getKey();
                     String title = snapshot.child("Title").getValue(String.class);
                     String cost = snapshot.child("Cost").getValue(String.class);
                     String bitmap = snapshot.child("Bitmap").getValue(String.class);
@@ -147,6 +155,9 @@ public class SearchActivity extends AppCompatActivity {
                         costList.add(cost);
                         bitmapList.add(bitmap);
                         descriptionList.add(description);
+                        latiList.add(latitude);
+                        longList.add(longitude);
+                        uidList.add(id);
                         hashMap.put(id, markerInfoSearch);
                         counter++;
                     }else if (description.toLowerCase().contains(searchedString.toLowerCase())){
@@ -154,15 +165,18 @@ public class SearchActivity extends AppCompatActivity {
                         costList.add(cost);
                         bitmapList.add(bitmap);
                         descriptionList.add(description);
+                        latiList.add(latitude);
+                        longList.add(longitude);
+                        uidList.add(id);
                         hashMap.put(id, markerInfoSearch);
                         counter++;
                     }
 
-                    if(counter == 30)
+                    if(counter == 15)
                         break;
                 }
 
-                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList, descriptionList, uidList);
+                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList, descriptionList, uidList, latiList, longList);
                 resultList.setAdapter(searchAdapter);
 
             }

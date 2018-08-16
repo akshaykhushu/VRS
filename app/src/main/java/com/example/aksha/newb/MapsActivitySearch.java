@@ -102,12 +102,8 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
     public void setMarker(MarkerInfoSearch markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
-//        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-//        BitmapDescriptor bitmapDescriptor2 = BitmapDescriptorFactory.fromBitmap(circularBitmap);
         MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
-        Marker marker = mMap.addMarker(mo);
-        marker.showInfoWindow();
-        //markerInfoMap.put(marker.getId(), markerInfo);
+        mMap.addMarker(mo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {

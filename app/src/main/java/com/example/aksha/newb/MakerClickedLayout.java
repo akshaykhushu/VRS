@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +24,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MakerClickedLayout extends AppCompatActivity {
@@ -38,8 +45,18 @@ public class MakerClickedLayout extends AppCompatActivity {
     String latitude;
     String imageUrl;
     String id;
+    ArrayList<String> bitmapUrl;
+    int totalImages;
+    int current = 0;
+    HashMap<String, String> storedImagePath = new HashMap<>();
+    ImageButton buttonNextMarkerClicked;
+    ImageButton buttonPreviousMarkerClicked;
     StorageReference storageReference;
     File outputFile;
+    int i;
+
+    File myDir = null;
+
     //    Matrix matrix = new Matrix();
 //    Float scale = 10f;
 //    ScaleGestureDetector SGD;
@@ -52,43 +69,97 @@ public class MakerClickedLayout extends AppCompatActivity {
         EditText eTdes = findViewById(R.id.editTextDescriptionMarkerClicked);
         EditText eTcost = findViewById(R.id.editTextCostMarkerClicked);
         imageView = findViewById(R.id.imageViewMarkerClicked);
+        buttonNextMarkerClicked = findViewById(R.id.buttonNextMarkerClicked);
+        buttonPreviousMarkerClicked = findViewById(R.id.buttonPreviousMarkerClicked);
 
         eT.setText(getIntent().getStringExtra("Title").toString());
         eTdes.setText(getIntent().getStringExtra("Description").toString());
         eTcost.setText(getIntent().getStringExtra("Cost").toString());
         latitude = getIntent().getStringExtra("Latitude").toString();
         longitude = getIntent().getStringExtra("Longitude").toString();
-        imageUrl = getIntent().getStringExtra("Bitmap").toString();
         id = getIntent().getStringExtra("Id").toString();
+        totalImages = getIntent().getIntExtra("TotalImages", 1);
+        bitmapUrl = getIntent().getStringArrayListExtra("Bitmap");
 
         storageReference = FirebaseStorage.getInstance().getReference(id);
-        StorageReference url = storageReference.child("Image");
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Please Wait");
-        progressDialog.setMessage("Loading");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);
 
-        Picasso.with(MakerClickedLayout.this).load(Uri.parse(imageUrl)).into(imageView);
-        progressDialog.dismiss();
+        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).
+                fetch(new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         ImageButton imageButton = findViewById(R.id.buttonDirections);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-//                        Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
-//                startActivity(intent);
                 String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f", Float.parseFloat(latitude), Float.parseFloat(longitude));
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
                 startActivity(intent);
             }
         });
+
+
+        Bitmap bitmap = BitmapFactory.decodeFile(storedImagePath.get(bitmapUrl.get(0)));
+        imageView.setImageBitmap(bitmap);
+
+        buttonNextMarkerClicked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (current >= bitmapUrl.size() - 1) {
+                    return;
+                }
+                current++;
+                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
+                        fetch(new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
+        buttonPreviousMarkerClicked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (current <= 0) {
+                    return;
+                }
+                current--;
+                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
+                        fetch(new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
     }
 
-    public void FullScreen(View view){
+    public void FullScreen(View view) {
         Intent intent = new Intent(this, FullImageView.class);
-        intent.putExtra("image", imageUrl);
+        intent.putExtra("image", bitmapUrl.get(current));
         startActivity(intent);
     }
 

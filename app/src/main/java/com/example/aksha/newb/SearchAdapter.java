@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder>{
@@ -25,6 +26,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     ArrayList<String> bitmapList;
     ArrayList<String> descriptionList;
     ArrayList<String> uidList;
+    ArrayList<String> latiList;
+    ArrayList<String> longList;
 
     class SearchViewHolder extends RecyclerView.ViewHolder {
 
@@ -41,13 +44,15 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         }
     }
 
-    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<String> bitmapList, ArrayList<String> descriptionList, ArrayList<String> uidList) {
+    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<String> bitmapList, ArrayList<String> descriptionList, ArrayList<String> uidList, ArrayList<String> latiList, ArrayList<String> longList) {
         this.context = context;
         this.titleList = titleList;
         this.costList = costList;
         this.bitmapList = bitmapList;
         this.descriptionList = descriptionList;
         this.uidList = uidList;
+        this.latiList = latiList;
+        this.longList = longList;
     }
 
     @Override
@@ -72,6 +77,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
                 intent.putExtra("Cost", costList.get(position));
                 intent.putExtra("Description", descriptionList.get(position));
                 intent.putExtra("Bitmap", bitmapList.get(position));
+                intent.putExtra("Latitude", latiList.get(position));
+                intent.putExtra("Longitude", longList.get(position));
+                intent.putExtra("Id", uidList.get(position));
                 context.startActivity(intent);
             }
         });

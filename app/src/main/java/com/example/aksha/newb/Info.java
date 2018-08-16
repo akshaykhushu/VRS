@@ -11,15 +11,18 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcel;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.provider.Settings.Secure;
 import android.widget.Spinner;
@@ -33,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -41,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,48 +58,108 @@ public class Info extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     protected Bitmap bitmap;
+    ImageButton addImages;
     Uri imageUri;
     String imageStr;
+    ImageButton buttonNext;
+    ImageButton buttonPrevious;
     Map<String, Object> map;
+    int current=0;
     private StorageReference storageReference;
-    Uri downloadUrl;
+    ArrayList<Uri> downloadUrl = new ArrayList<>();
+    ImageView imageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-//        bitmap = getIntent().getParcelableExtra("Image");
         imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
         imageUri = Uri.parse(imageStr);
-        ImageView imageView = findViewById(R.id.imageView);
         bitmap = BitmapFactory.decodeFile(imageStr);
+        imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(bitmap);
-//        int nh = (int) ( bitmap.getHeight() * (1080.0 / bitmap.getWidth()) );
-//        Bitmap scaled = Bitmap.createScaledBitmap(bitmap, 1080, nh, true);
-//        imageView.setImageBitmap(scaled);
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         map = new HashMap<>();
         firebaseAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference(firebaseAuth.getCurrentUser().getUid());
+        addImages = findViewById(R.id.buttonMoreImages);
+        addImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String filename = Environment.getExternalStorageDirectory().getPath() + "/test/testfile.jpg";
+                imageUri = Uri.fromFile(new File(filename));
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(cameraIntent, 123);
+            }
+        });
+
+        buttonNext = findViewById(R.id.buttonNext);
+        buttonPrevious = findViewById(R.id.buttonPrevious);
+
+        buttonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (current >= downloadUrl.size()-1)   {
+                    return;
+                }
+                current++;
+                //Picasso.with(Info.this).load(downloadUrl.get(current)).into(imageView);
+
+                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
+                        fetch(new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+            }
+        });
+
+        buttonPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(current <= 0){
+                    return;
+                }
+                current--;
+                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
+                        fetch(new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
 
         Uri file = Uri.fromFile(new File(imageStr));
-        StorageReference fileRef = storageReference.child("Image");
+        StorageReference fileRef = storageReference.child("Image" + downloadUrl.size());
+
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Please Wait");
         progressDialog.setMessage("Loading");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
+
         fileRef.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                if(taskSnapshot.getDownloadUrl() != null){
-                    downloadUrl = taskSnapshot.getDownloadUrl();
-
-                } else if(taskSnapshot.getMetadata().getDownloadUrl() != null) {
-                    downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                }
-                Toast.makeText(getApplicationContext(), "Image uploaded", Toast.LENGTH_SHORT).show();
+                downloadUrl.add(taskSnapshot.getDownloadUrl());
                 progressDialog.dismiss();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -102,6 +168,44 @@ public class Info extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Could Not Upload Data", Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        try {
+            if (resultCode == RESULT_OK) {
+
+
+                imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
+
+                StorageReference fileRef = storageReference.child("Image"+downloadUrl.size());
+                final ProgressDialog progressDialog = new ProgressDialog(this);
+                progressDialog.setTitle("Please Wait");
+                progressDialog.setMessage("Loading");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                Uri file = Uri.fromFile(new File(imageStr));
+                fileRef.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        downloadUrl.add(taskSnapshot.getDownloadUrl());
+                        Picasso.with(getApplicationContext()).load(taskSnapshot.getDownloadUrl()).into(imageView);
+                        progressDialog.dismiss();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Could Not Upload Data", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        } catch (Exception e) {
+
+        }
 
     }
 
@@ -125,16 +229,26 @@ public class Info extends AppCompatActivity {
         MapsActivity.myLocation = location;
         android_id = MapsActivity.UserId;
         DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
-//        ByteArrayOutputStream ByteStream = new  ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
-//        byte [] b=ByteStream.toByteArray();
-//        String temp= Base64.encodeToString(b, Base64.DEFAULT);
         Log.e("Longitude", String.valueOf(location.getLongitude()));
         Log.e("Latitude", String.valueOf(location.getLatitude()));
 
+        if (TextUtils.isEmpty(eT.getText().toString())){
+            Toast.makeText(getApplicationContext(), "Name is a required Field", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (TextUtils.isEmpty(eTdes.getText().toString())){
+            Toast.makeText(getApplicationContext(), "Description is a required Field", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (TextUtils.isEmpty(eTcost.getText().toString())){
+            Toast.makeText(getApplicationContext(), "Cost is a required Field", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-
-        databaseReference.child("Bitmap").setValue(downloadUrl.toString());
+        databaseReference.child("TotalImages").setValue(String.valueOf(downloadUrl.size()));
+        for (int i=0;i<downloadUrl.size();i++){
+            databaseReference.child("Bitmap"+i).setValue(downloadUrl.get(i).toString());
+        }
         databaseReference.child("LocationLong").setValue(String.valueOf(location.getLongitude()));
         databaseReference.child("LocationLati").setValue(String.valueOf(location.getLatitude()));
         databaseReference.child("Title").setValue(eT.getText().toString());
