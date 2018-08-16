@@ -23,6 +23,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     Context context;
     ArrayList<String> titleList;
     ArrayList<String> costList;
+    ArrayList<ArrayList<String>> bitmapList2D;
     ArrayList<String> bitmapList;
     ArrayList<String> descriptionList;
     ArrayList<String> uidList;
@@ -44,11 +45,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         }
     }
 
-    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<String> bitmapList, ArrayList<String> descriptionList, ArrayList<String> uidList, ArrayList<String> latiList, ArrayList<String> longList) {
+    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<ArrayList<String>> bitmapList, ArrayList<String> descriptionList, ArrayList<String> uidList, ArrayList<String> latiList, ArrayList<String> longList) {
         this.context = context;
         this.titleList = titleList;
         this.costList = costList;
-        this.bitmapList = bitmapList;
+        this.bitmapList2D = bitmapList2D;
         this.descriptionList = descriptionList;
         this.uidList = uidList;
         this.latiList = latiList;
@@ -67,7 +68,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         holder.textViewName.setText(titleList.get(position));
         holder.textViewCost.setText(costList.get(position));
 
-        Picasso.with(context).load(bitmapList.get(position)).into(holder.imageView);
+        Picasso.with(context).load(bitmapList2D.get(position).get(0)).into(holder.imageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +77,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
                 intent.putExtra("Title", titleList.get(position));
                 intent.putExtra("Cost", costList.get(position));
                 intent.putExtra("Description", descriptionList.get(position));
-                intent.putExtra("Bitmap", bitmapList.get(position));
+                //intent.putExtra("Bitmap", bitmapList.get(position));
+                intent.putStringArrayListExtra("Bitmap", bitmapList2D.get(position));
                 intent.putExtra("Latitude", latiList.get(position));
                 intent.putExtra("Longitude", longList.get(position));
                 intent.putExtra("Id", uidList.get(position));
