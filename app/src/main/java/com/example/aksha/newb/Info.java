@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.GpsSatellite;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
@@ -28,6 +30,7 @@ import android.provider.Settings.Secure;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,13 +65,42 @@ public class Info extends AppCompatActivity {
     Uri imageUri;
     String imageStr;
     ImageButton buttonNext;
+    Location myLocation;
     ImageButton buttonPrevious;
     Map<String, Object> map;
-    int current=0;
+    int current = 0;
     private StorageReference storageReference;
     ArrayList<Uri> downloadUrl = new ArrayList<>();
     ImageView imageView;
+    Double longitude;
+    Double latitude;
 
+
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+
+            if (location != null) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +112,18 @@ public class Info extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(bitmap);
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2, 0, locationListener);
+
         map = new HashMap<>();
         firebaseAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference(firebaseAuth.getCurrentUser().getUid());
@@ -107,18 +151,19 @@ public class Info extends AppCompatActivity {
                 current++;
                 //Picasso.with(Info.this).load(downloadUrl.get(current)).into(imageView);
 
-                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
-                        fetch(new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+//                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
+//                        fetch(new Callback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
 
             }
         });
@@ -130,18 +175,19 @@ public class Info extends AppCompatActivity {
                     return;
                 }
                 current--;
-                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
-                        fetch(new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+//                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
+//                        fetch(new Callback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
             }
         });
 
@@ -193,7 +239,8 @@ public class Info extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         downloadUrl.add(taskSnapshot.getDownloadUrl());
-                        Picasso.with(getApplicationContext()).load(taskSnapshot.getDownloadUrl()).into(imageView);
+//                        Picasso.with(getApplicationContext()).load(taskSnapshot.getDownloadUrl()).into(imageView);
+                        Glide.with(getApplicationContext()).load(taskSnapshot.getDownloadUrl()).into(imageView);
                         progressDialog.dismiss();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -223,14 +270,24 @@ public class Info extends AppCompatActivity {
         EditText eTcost = findViewById(R.id.editTextCost);
         Spinner spinner = findViewById(R.id.spinnerCurrency);
         String text = spinner.getSelectedItem().toString();
-        text = text + " ";
+//        text = text + " ";
 
-        Location location = getLastKnownLocation();
-        MapsActivity.myLocation = location;
+        GPSTracker tracker = new GPSTracker(this);
+        if (!tracker.canGetLocation()) {
+            tracker.showSettingsAlert();
+        } else {
+            latitude = tracker.getLatitude();
+            longitude = tracker.getLongitude();
+        }
+
+        //Location location = getLastKnownLocation();
+        //MapsActivity.myLocation = myLocation;
         android_id = MapsActivity.UserId;
         DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
-        Log.e("Longitude", String.valueOf(location.getLongitude()));
-        Log.e("Latitude", String.valueOf(location.getLatitude()));
+//        Log.e("Longitude", String.valueOf(myLocation.getLongitude()));
+        Log.e("Longitude", String.valueOf(longitude));
+//        Log.e("Latitude", String.valueOf(myLocation.getLatitude()));
+        Log.e("Latitude", String.valueOf(latitude));
 
         if (TextUtils.isEmpty(eT.getText().toString())){
             Toast.makeText(getApplicationContext(), "Name is a required Field", Toast.LENGTH_SHORT).show();
@@ -249,8 +306,8 @@ public class Info extends AppCompatActivity {
         for (int i=0;i<downloadUrl.size();i++){
             databaseReference.child("Bitmap"+i).setValue(downloadUrl.get(i).toString());
         }
-        databaseReference.child("LocationLong").setValue(String.valueOf(location.getLongitude()));
-        databaseReference.child("LocationLati").setValue(String.valueOf(location.getLatitude()));
+        databaseReference.child("LocationLong").setValue(String.valueOf(longitude));
+        databaseReference.child("LocationLati").setValue(String.valueOf(latitude));
         databaseReference.child("Title").setValue(eT.getText().toString());
         databaseReference.child("Description").setValue(eTdes.getText().toString());
         databaseReference.child("Cost").setValue(text + eTcost.getText().toString());

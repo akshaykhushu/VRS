@@ -67,6 +67,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.ui.BubbleIconFactory;
+import com.google.maps.android.ui.IconGenerator;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -95,6 +98,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static Map<String, MarkerInfo> markerInfoMap;
 
     public static String UserId;
+
+
+    private ClusterManager<com.example.aksha.newb.Marker> mClusterManager;
+
 
     Uri imageUri;
     StorageReference storageReference;
@@ -155,7 +162,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -180,6 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                markerInfoMap.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MarkerInfo markerInfo = new MarkerInfo();
                     ArrayList<String> bitmapUrl = new ArrayList<>();
@@ -193,10 +200,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         markerInfo.setBitmapUrl(bitmapUrl);
                         markerInfo.setDescription(snapshot.child("Description").getValue().toString());
                         markerInfo.setCost(snapshot.child("Cost").getValue().toString());
+                        cost = snapshot.child("Cost").getValue().toString();
                         markerInfo.setLongitude(snapshot.child("LocationLong").getValue().toString());
                         markerInfo.setLatitude(snapshot.child("LocationLati").getValue().toString());
                         markerInfo.setId(snapshot.child("Id").getValue().toString());
                         markerInfo.setTitle(snapshot.child("Title").getValue().toString());
+                        title = snapshot.child("Title").getValue().toString();
                         if (!markerInfoMap.containsKey(userId)){
                             MapsActivity.markerInfoMap.put(userId, markerInfo);
                         }
@@ -251,7 +260,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }, 200);
             return;
         }
-
         mMap.setMyLocationEnabled(true);
 
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
@@ -300,7 +308,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setMarker(MarkerInfo markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
-        MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
+        IconGenerator iconGenerator = new IconGenerator(this);
+//        iconGenerator.setColor(R.color.Green);
+        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+        iconGenerator.setTextAppearance(R.style.iconGenText);
+        Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
+        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
         Marker marker = mMap.addMarker(mo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));

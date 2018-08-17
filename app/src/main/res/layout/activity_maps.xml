@@ -35,7 +35,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:background="@android:color/white"
+            android:background="@android:color/holo_orange_dark"
             android:layout_height="50dp">
 
 
@@ -45,15 +45,15 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@android:drawable/alert_dark_frame" />
+                android:src="@android:drawable/ic_menu_sort_by_size" />
 
             <EditText
                 android:id="@+id/editTextSearchBar"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="13dp"
                 android:layout_weight="7"
-                android:background="@drawable/search_layout"
+                android:background="@android:color/white"
                 android:editable="false"
                 android:ems="10"
                 android:hint="Search"
@@ -67,12 +67,14 @@
             <Button
                 android:id="@+id/buttonListView"
                 android:layout_width="0dp"
-                android:layout_weight="2"
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
+                android:background="@color/colorAccent"
+                android:layout_weight="2"
                 android:onClick="ListView"
-                android:text="List" />
+                android:text="List"
+                android:textColor="@android:color/white" />
 
 
         </LinearLayout>

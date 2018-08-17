@@ -146,11 +146,10 @@ public class SearchActivity extends AppCompatActivity {
                     for (int i=0; i < totalImages; i++){
                         bitmapList.add(snapshot.child("Bitmap"+i).getValue().toString());
                     }
-                    bitmapList2D.add(bitmapList);
-                    
-                    
+
+
                     MarkerInfoSearch markerInfoSearch = new MarkerInfoSearch();
-                    markerInfoSearch.setBitmapUrl(bitmapList2D);
+                    markerInfoSearch.setBitmapUrl(bitmapList);
                     markerInfoSearch.setTitle(title);
                     markerInfoSearch.setDescription(description);
                     markerInfoSearch.setLatitude(latitude);
@@ -162,7 +161,7 @@ public class SearchActivity extends AppCompatActivity {
                     if(title.toLowerCase().contains(searchedString.toLowerCase())){
                         titleList.add(title);
                         costList.add(cost);
-                        bitmapList.add(bitmapList2D);
+                        bitmapList2D.add(bitmapList);
                         descriptionList.add(description);
                         latiList.add(latitude);
                         longList.add(longitude);
@@ -172,7 +171,7 @@ public class SearchActivity extends AppCompatActivity {
                     }else if (description.toLowerCase().contains(searchedString.toLowerCase())){
                         titleList.add(title);
                         costList.add(cost);
-                        bitmapList.add(bitmapList2D);
+                        bitmapList2D.add(bitmapList);
                         descriptionList.add(description);
                         latiList.add(latitude);
                         longList.add(longitude);

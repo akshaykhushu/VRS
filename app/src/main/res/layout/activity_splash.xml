@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@android:color/holo_orange_light"
+    android:background="@android:color/holo_orange_dark"
     android:layout_height="match_parent"
     tools:context=".SplashActivity">
 
@@ -12,5 +12,6 @@
         android:layout_width="141dp"
         android:layout_height="117dp"
         android:layout_centerInParent="true"
+        android:background="@android:color/holo_orange_dark"
         app:srcCompat="@android:drawable/ic_menu_mapmode" />
 </RelativeLayout>

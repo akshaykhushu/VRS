@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -45,7 +46,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         }
     }
 
-    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<ArrayList<String>> bitmapList, ArrayList<String> descriptionList, ArrayList<String> uidList, ArrayList<String> latiList, ArrayList<String> longList) {
+    public SearchAdapter(Context context, ArrayList<String> titleList, ArrayList<String> costList, ArrayList<ArrayList<String>> bitmapList2D, ArrayList<String> descriptionList, ArrayList<String> uidList, ArrayList<String> latiList, ArrayList<String> longList) {
         this.context = context;
         this.titleList = titleList;
         this.costList = costList;
@@ -68,7 +69,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         holder.textViewName.setText(titleList.get(position));
         holder.textViewCost.setText(costList.get(position));
 
-        Picasso.with(context).load(bitmapList2D.get(position).get(0)).into(holder.imageView);
+        Glide.with(context).load(bitmapList2D.get(position).get(0)).into(holder.imageView);
+//        Picasso.with(context).load(bitmapList2D.get(position).get(0)).into(holder.imageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

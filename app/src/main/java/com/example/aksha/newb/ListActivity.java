@@ -18,6 +18,8 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.AdapterView;
+
+import com.bumptech.glide.Glide;
 import com.example.aksha.newb.*;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -85,7 +87,7 @@ public class ListActivity extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> adapter, View view, int position, long arg) {
                 Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                intent.putExtra("Bitmap", listItems.get(position).getBitmapUrl());
+                intent.putStringArrayListExtra("Bitmap", listItems.get(position).getBitmapUrl());
                 intent.putExtra("Title",listItems.get(position).getTitle());
                 intent.putExtra("Description", listItems.get(position).getDescription());
                 intent.putExtra("Cost",listItems.get(position).getCost());
@@ -121,7 +123,8 @@ public class ListActivity extends AppCompatActivity {
             imageView = view.findViewById(R.id.imageViewListItem);
             textViewName = view.findViewById(R.id.textViewListItemName);
             textViewCost = view.findViewById(R.id.textViewListItemCost);
-            Picasso.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl().get(0))).into(imageView);
+            Glide.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl().get(0))).into(imageView);
+//            Picasso.with(ListActivity.this).load(Uri.parse(listItems.get(position).getBitmapUrl().get(0))).into(imageView);
             textViewName.setText(listItems.get(position).getTitle());
             textViewCost.setText(listItems.get(position).getCost());
             return view;

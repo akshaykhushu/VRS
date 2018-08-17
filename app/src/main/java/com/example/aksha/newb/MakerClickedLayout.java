@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -84,18 +85,20 @@ public class MakerClickedLayout extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference(id);
         Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);
 
-        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).
-                fetch(new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
-                    }
+        Glide.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
 
-                    @Override
-                    public void onError() {
-                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).
+//                fetch(new Callback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
+//                    }
+//
+//                    @Override
+//                    public void onError() {
+//                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
         ImageButton imageButton = findViewById(R.id.buttonDirections);
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -115,21 +118,23 @@ public class MakerClickedLayout extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (current >= bitmapUrl.size() - 1) {
+                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 current++;
-                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
-                        fetch(new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+//                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
+//                        fetch(new Callback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
             }
         });
 
@@ -137,21 +142,23 @@ public class MakerClickedLayout extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (current <= 0) {
+                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 current--;
-                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
-                        fetch(new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+//                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
+//                        fetch(new Callback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
             }
         });
 
@@ -163,20 +170,4 @@ public class MakerClickedLayout extends AppCompatActivity {
         startActivity(intent);
     }
 
-//    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener{
-//        @Override
-//        public boolean onScale(ScaleGestureDetector detector) {
-//            scale = scale * detector.getScaleFactor();
-//            scale = Math.max(0.1f, Math.min(scale, 5f));
-//            matrix.setScale(scale, scale);
-//            imageView.setImageMatrix(matrix);
-//            return true;
-//        }
-//    }
-//
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        SGD.onTouchEvent(event);
-//        return true;
-//    }
 }

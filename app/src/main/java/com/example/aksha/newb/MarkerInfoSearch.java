@@ -2,6 +2,8 @@ package com.example.aksha.newb;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 public class MarkerInfoSearch {
     ArrayList<String> bitmapUrl;
     String cost;
@@ -10,6 +12,15 @@ public class MarkerInfoSearch {
     String latitude;
     String id;
     String title;
+    Integer totalImages;
+
+    public Integer getTotalImages() {
+        return totalImages;
+    }
+
+    public void setTotalImages(Integer totalImages) {
+        this.totalImages = totalImages;
+    }
 
     public String getTitle() {
         return title;

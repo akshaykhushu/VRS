@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -44,18 +45,19 @@ public class FullImageView extends AppCompatActivity {
         setContentView(R.layout.activity_full_image_view);
         outputFile = getIntent().getStringExtra("image");
         imageView = findViewById(R.id.imageViewFullScreen);
-        Picasso.with(getApplicationContext()).load(outputFile).
-                fetch(new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Picasso.with(getApplicationContext()).load(outputFile).into(imageView);
-                    }
-
-                    @Override
-                    public void onError() {
-                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        Glide.with(getApplicationContext()).load(outputFile).into(imageView);
+//        Picasso.with(getApplicationContext()).load(outputFile).
+//                fetch(new Callback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        Picasso.with(getApplicationContext()).load(outputFile).into(imageView);
+//                    }
+//
+//                    @Override
+//                    public void onError() {
+//                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
         matrix = imageView.getImageMatrix();
         matrix.setScale(0.4f, 0.4f);
         imageView.setImageMatrix(matrix);
