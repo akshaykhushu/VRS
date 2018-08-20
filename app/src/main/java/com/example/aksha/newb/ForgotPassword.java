@@ -42,6 +42,7 @@ public class ForgotPassword extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 Toast.makeText(getApplicationContext(), "Password Reset Link sent. Please check your Inbox", Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                finish();
                                 startActivity(intent);
                             }
                             else{

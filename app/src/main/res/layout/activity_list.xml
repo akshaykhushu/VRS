@@ -24,6 +24,7 @@
             android:focusable="false"
             android:hint="Search"
             android:inputType="none"
+            android:textColorHint="@android:color/black"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:textColor="@android:color/black"
@@ -46,6 +47,7 @@
     <ListView
         android:id="@+id/dynamicList"
         android:layout_width="match_parent"
+        android:dividerHeight="1px"
         android:clickable="true"
         android:layout_height="match_parent" />
 

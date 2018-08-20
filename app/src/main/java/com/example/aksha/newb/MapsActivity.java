@@ -46,6 +46,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -96,6 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String description;
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
+    int count=0;
 
     public static String UserId;
 
@@ -103,10 +105,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<com.example.aksha.newb.Marker> mClusterManager;
 
 
+    Double myLatitude;
+    Double myLongitude;
     Uri imageUri;
-    StorageReference storageReference;
-
-    public static Location myLocation;
     private FirebaseAuth firebaseAuth;
     ImageButton imgNavButton;
 
@@ -134,14 +135,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
         final NavigationView navigationView =  findViewById(R.id.navigation_view);
         View hView =  navigationView.getHeaderView(0);
-        ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
-        try{
-            user_nav_image.setImageURI(firebaseAuth.getCurrentUser().getPhotoUrl());
-        }
-        catch(NullPointerException e){
-            Log.e("User Has no image", e.getLocalizedMessage());
-            user_nav_image.setImageResource(R.drawable.ic_launcher_foreground);
-        }
+//        ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
+//        try{
+//            user_nav_image.setImageURI(firebaseAuth.getCurrentUser().getPhotoUrl());
+//        }
+//        catch(NullPointerException e){
+//            Log.e("User Has no image", e.getLocalizedMessage());
+//            user_nav_image.setImageResource(R.drawable.ic_launcher_foreground);
+//        }
         TextView nav_user = hView.findViewById(R.id.textViewUserId);
         nav_user.setText(firebaseAuth.getCurrentUser().getEmail());
         EditText et = findViewById(R.id.editTextSearchBar);
@@ -222,7 +223,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
 
+    private void setUpCluster(Double longitude, Double latitude) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(longitude, latitude), 2));
+        mClusterManager = new ClusterManager<com.example.aksha.newb.Marker>(this, mMap);
+        
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        addItems(longitude, latitude);
+    }
+
+    private void addItems(Double longitude, Double latitude) {
+//        for (int i = 0; i < 10; i++) {
+//            double offset = i / 60d;
+//            latitude = latitude + offset;
+//            longitude = longitude + offset;
+            com.example.aksha.newb.Marker offsetItem = new com.example.aksha.newb.Marker(latitude, longitude);
+            mClusterManager.addItem(offsetItem);
+//        }
     }
 
     @Override
@@ -231,17 +250,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             if (resultCode == RESULT_OK) {
-//                Bundle extras = data.getExtras();
-//                bitmap = (Bitmap) extras.get("data");
-//                ImageView img =  findViewById(R.id.image);
-//                img.setImageURI(imageUri);
                 Intent intent = new Intent(this, Info.class);
                 intent.putExtra("Image", imageUri.toString());
                 startActivity(intent);
                 finish();
             }
         } catch (Exception e) {
-
+            Toast.makeText(getApplicationContext(), "There was some problem while Taking the Picture. Try Again", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -274,6 +289,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rlp.addRule(RelativeLayout.ALIGN_END, 0);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         rlp.setMargins(100, 0, 0, 200);
+
+
+        GPSTracker tracker = new GPSTracker(this);
+        if (!tracker.canGetLocation()) {
+            tracker.showSettingsAlert();
+        } else {
+            myLatitude = tracker.getLatitude();
+            myLongitude = tracker.getLongitude();
+        }
+
+
+        LatLng myLocation = new LatLng(myLatitude, myLongitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
     }
 
 
@@ -308,6 +337,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setMarker(MarkerInfo markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
+
+        //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
         IconGenerator iconGenerator = new IconGenerator(this);
 //        iconGenerator.setColor(R.color.Green);
         iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
@@ -315,6 +347,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
         MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
         Marker marker = mMap.addMarker(mo);
+//        marker.setIcon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -339,6 +372,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+        LatLng myLocation = new LatLng(myLatitude, myLongitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
+
     }
 
     private void setNavigationViewListner() {
@@ -350,14 +388,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.nav_MyAccount: {
-                Intent intent = new Intent(getApplicationContext(), AccountSettings.class);
+            case R.id.nav_Help: {
+                Intent intent = new Intent(getApplicationContext(), HelpActivity.class);
                 startActivity(intent);
                 break;
             }
 
             case R.id.nav_Images: {
+                String filename = Environment.getExternalStorageDirectory().getPath() + "/test/testfile.jpg";
+                imageUri = Uri.fromFile(new File(filename));
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(cameraIntent, 123);
                 break;
             }

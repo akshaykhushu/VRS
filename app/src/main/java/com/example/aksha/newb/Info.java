@@ -59,7 +59,7 @@ public class Info extends AppCompatActivity {
 
     LocationManager locationManager;
     FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    FirebaseDatabase firebaseDatabase;
     protected Bitmap bitmap;
     ImageButton addImages;
     Uri imageUri;
@@ -74,6 +74,7 @@ public class Info extends AppCompatActivity {
     ImageView imageView;
     Double longitude;
     Double latitude;
+    DatabaseReference databaseReference;
 
 
     private final LocationListener locationListener = new LocationListener() {
@@ -138,7 +139,7 @@ public class Info extends AppCompatActivity {
                 startActivityForResult(cameraIntent, 123);
             }
         });
-
+        firebaseDatabase = FirebaseDatabase.getInstance();
         buttonNext = findViewById(R.id.buttonNext);
         buttonPrevious = findViewById(R.id.buttonPrevious);
 
@@ -270,7 +271,6 @@ public class Info extends AppCompatActivity {
         EditText eTcost = findViewById(R.id.editTextCost);
         Spinner spinner = findViewById(R.id.spinnerCurrency);
         String text = spinner.getSelectedItem().toString();
-//        text = text + " ";
 
         GPSTracker tracker = new GPSTracker(this);
         if (!tracker.canGetLocation()) {
@@ -280,13 +280,14 @@ public class Info extends AppCompatActivity {
             longitude = tracker.getLongitude();
         }
 
-        //Location location = getLastKnownLocation();
-        //MapsActivity.myLocation = myLocation;
+
         android_id = MapsActivity.UserId;
-        DatabaseReference databaseReference = firebaseDatabase.getReference(android_id);
-//        Log.e("Longitude", String.valueOf(myLocation.getLongitude()));
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
+        databaseReference = firebaseDatabase.getReference(firebaseAuth.getCurrentUser().getUid());
+
+
         Log.e("Longitude", String.valueOf(longitude));
-//        Log.e("Latitude", String.valueOf(myLocation.getLatitude()));
         Log.e("Latitude", String.valueOf(latitude));
 
         if (TextUtils.isEmpty(eT.getText().toString())){
@@ -302,6 +303,8 @@ public class Info extends AppCompatActivity {
             return;
         }
 
+        FirebaseAuth firebaseAuth1 = FirebaseAuth.getInstance();
+
         databaseReference.child("TotalImages").setValue(String.valueOf(downloadUrl.size()));
         for (int i=0;i<downloadUrl.size();i++){
             databaseReference.child("Bitmap"+i).setValue(downloadUrl.get(i).toString());
@@ -311,7 +314,7 @@ public class Info extends AppCompatActivity {
         databaseReference.child("Title").setValue(eT.getText().toString());
         databaseReference.child("Description").setValue(eTdes.getText().toString());
         databaseReference.child("Cost").setValue(text + eTcost.getText().toString());
-        databaseReference.child("Id").setValue(android_id);
+        databaseReference.child("Id").setValue(firebaseAuth1.getCurrentUser().getUid());
         MapsActivity.upload = 1;
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);

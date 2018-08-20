@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@android:color/holo_orange_dark"
         android:orientation="horizontal">
 
         <EditText
@@ -20,11 +21,11 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:layout_marginStart="13dp"
-            android:background="@drawable/search_layout"
+            android:background="@android:color/white"
             android:ems="10"
             android:hint="Search"
             android:inputType="textPersonName"
-            android:textColor="#999999"
+            android:textColor="#000000"
             android:textSize="16sp"
             tools:fontFamily="@font/nunito_semibold" />
 
