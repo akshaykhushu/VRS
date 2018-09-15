@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -149,7 +150,7 @@ public class MakerClickedLayout extends AppCompatActivity {
 //                    }
 //                });
 
-        ImageButton imageButton = findViewById(R.id.buttonDirections);
+        Button imageButton = findViewById(R.id.buttonDirections);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

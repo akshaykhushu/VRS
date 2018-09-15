@@ -61,6 +61,8 @@ public class ListActivity extends AppCompatActivity {
 
     public void MapView(View view){
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        finish();
         startActivity(intent);
     }
 

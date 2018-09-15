@@ -17,7 +17,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:background="@android:color/white"
+        android:background="@android:color/holo_orange_dark"
         android:layout_height="50dp">
 
 
@@ -29,7 +29,7 @@
             android:layout_alignBottom="@+id/buttonListView"
             android:layout_alignParentStart="true"
             android:layout_marginStart="13dp"
-            android:background="@drawable/search_layout"
+            android:background="@android:color/white"
             android:ems="10"
             android:hint="Search"
             android:inputType="textPersonName"
@@ -40,12 +40,14 @@
         <Button
             android:id="@+id/buttonListView"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:layout_weight="1"
+            android:background="@android:color/holo_orange_dark"
             android:onClick="ListView"
-            android:text="List" />
+            android:text="List"
+            android:textColor="@android:color/white" />
 
 
     </LinearLayout>

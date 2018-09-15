@@ -9,6 +9,14 @@
         <item>¥</item>
         <item>£</item>
     </string-array>
+
+    <string-array name="category">
+        <item>Beverages</item>
+        <item>Beauty and Hygiene</item>
+        <item>Snacks and Branded Foods</item>
+        <item> Bakery, Cakes and Diary</item>
+    </string-array>
+
     <string name="title_activity_maps_search">Map</string>
 
     <string name="title_activity_splash">SplashActivity</string>

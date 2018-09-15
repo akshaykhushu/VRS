@@ -60,7 +60,7 @@
             android:name=".MapsActivitySearch"
             android:label="@string/title_activity_maps_search"
             android:theme="@style/AppTheme" />
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".AccountSettings" />
@@ -72,7 +72,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HelpActivity"></activity>
+        <activity android:name=".HelpActivity" />
+        <activity android:name=".TermsAndConditions" />
+        <activity android:name=".CategoryActivity" />
+        <activity android:name=".Beverages" />
+        <activity android:name=".BeautyAndHygieneActivity"></activity>
     </application>
 
 </manifest>

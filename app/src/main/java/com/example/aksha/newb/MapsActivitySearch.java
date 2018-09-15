@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -102,8 +103,14 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
     public void setMarker(MarkerInfoSearch markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
-        MarkerOptions mo = new MarkerOptions().position(current).title(markerInfo.getId());
-        mMap.addMarker(mo);
+        IconGenerator iconGenerator = new IconGenerator(this);
+//        iconGenerator.setColor(R.color.Green);
+        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+        iconGenerator.setTextAppearance(R.style.iconGenText);
+        Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
+        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
+
+        Marker marker = mMap.addMarker(mo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -113,12 +120,13 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
                 for (String id : SearchActivity.hashMap.keySet()) {
                     if (id.equals(idMarker)) {
                         Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                        intent.putExtra("Bitmap", SearchActivity.hashMap.get(id).getBitmapUrl());
+                        intent.putStringArrayListExtra("Bitmap", SearchActivity.hashMap.get(id).getBitmapUrl());
                         intent.putExtra("Title", SearchActivity.hashMap.get(id).getTitle());
                         intent.putExtra("Description", SearchActivity.hashMap.get(id).getDescription());
                         intent.putExtra("Cost", SearchActivity.hashMap.get(id).getCost());
                         intent.putExtra("Latitude", SearchActivity.hashMap.get(id).getLatitude());
                         intent.putExtra("Longitude", SearchActivity.hashMap.get(id).getLongitude());
+                        intent.putExtra("TotalImages", SearchActivity.hashMap.get(id).getTotalImages());
                         intent.putExtra("Id", SearchActivity.hashMap.get(id).getId());
                         startActivity(intent);
                     }

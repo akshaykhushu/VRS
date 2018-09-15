@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import id.zelory.compressor.Compressor;
+
 public class Info extends AppCompatActivity {
     protected String android_id;
 
@@ -108,6 +110,13 @@ public class Info extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
+        File actualImage = new File(imageStr);
+        File compressedImageFile = null;
+        try {
+            compressedImageFile = new Compressor(this).compressToFile(actualImage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         imageUri = Uri.parse(imageStr);
         bitmap = BitmapFactory.decodeFile(imageStr);
         imageView = findViewById(R.id.imageView);
@@ -150,21 +159,7 @@ public class Info extends AppCompatActivity {
                     return;
                 }
                 current++;
-                //Picasso.with(Info.this).load(downloadUrl.get(current)).into(imageView);
-
                 Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-//                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
-//                        fetch(new Callback() {
-//                            @Override
-//                            public void onSuccess() {
-//                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
 
             }
         });
@@ -177,23 +172,11 @@ public class Info extends AppCompatActivity {
                 }
                 current--;
                 Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-//                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).
-//                        fetch(new Callback() {
-//                            @Override
-//                            public void onSuccess() {
-//                                Picasso.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
             }
         });
 
 
-        Uri file = Uri.fromFile(new File(imageStr));
+        Uri file = Uri.fromFile(compressedImageFile);
         StorageReference fileRef = storageReference.child("Image" + downloadUrl.size());
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -228,6 +211,13 @@ public class Info extends AppCompatActivity {
 
 
                 imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
+                File actualImage = new File(imageStr);
+                File compressedImageFile = null;
+                try {
+                    compressedImageFile = new Compressor(this).compressToFile(actualImage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 StorageReference fileRef = storageReference.child("Image"+downloadUrl.size());
                 final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -235,7 +225,7 @@ public class Info extends AppCompatActivity {
                 progressDialog.setMessage("Loading");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
-                Uri file = Uri.fromFile(new File(imageStr));
+                Uri file = Uri.fromFile(compressedImageFile);
                 fileRef.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -290,15 +280,15 @@ public class Info extends AppCompatActivity {
         Log.e("Longitude", String.valueOf(longitude));
         Log.e("Latitude", String.valueOf(latitude));
 
-        if (TextUtils.isEmpty(eT.getText().toString())){
+        if (TextUtils.isEmpty(eT.getText().toString()) || TextUtils.isEmpty((eT.getText().toString().trim()))){
             Toast.makeText(getApplicationContext(), "Name is a required Field", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (TextUtils.isEmpty(eTdes.getText().toString())){
+        if (TextUtils.isEmpty(eTdes.getText().toString()) || TextUtils.isEmpty((eT.getText().toString().trim()))){
             Toast.makeText(getApplicationContext(), "Description is a required Field", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (TextUtils.isEmpty(eTcost.getText().toString())){
+        if (TextUtils.isEmpty(eTcost.getText().toString()) || TextUtils.isEmpty((eT.getText().toString().trim()))){
             Toast.makeText(getApplicationContext(), "Cost is a required Field", Toast.LENGTH_SHORT).show();
             return;
         }

@@ -28,7 +28,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:text="To Post something to Bazr, Click on the camera button"
+        android:text="To Post something on Bazr, Click on the camera button"
         android:textColor="@android:color/holo_orange_dark"
         android:textSize="20sp" />
 
@@ -49,8 +49,7 @@
         android:layout_marginRight="20dp"
         android:layout_height="wrap_content"
         android:text="Once the image is captured, Enter the name of your business, a brief description of what you are selling and the total cost of all the items.
-         \n\n\nIf you need to take more pictures. Click on the camera button to take more pictures.
-          \n\n PS: One user can post only one Ad."
+         \n\n\nIf you need to take more pictures. Click on the camera button to take more picture."
         android:textColor="@android:color/holo_orange_dark"
         android:textSize="20sp" />
 

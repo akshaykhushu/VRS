@@ -188,6 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 markerInfoMap.clear();
+                mMap.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MarkerInfo markerInfo = new MarkerInfo();
                     ArrayList<String> bitmapUrl = new ArrayList<>();
@@ -408,6 +409,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
                 break;
             }
+
+            case R.id.nav_TandC :{
+                Intent intent = new Intent(getApplicationContext(), TermsAndConditions.class);
+                startActivity(intent);
+                break;
+            }
+
+//            case R.id.nav_Categories : {
+//                Intent intent = new Intent(getApplicationContext(), CategoryActivity.class);
+//                startActivity(intent);
+//                break;
+//            }
 
             case R.id.nav_LogOut  :{
                 firebaseAuth.signOut();

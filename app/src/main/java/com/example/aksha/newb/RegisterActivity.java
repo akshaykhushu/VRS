@@ -49,14 +49,22 @@ public class RegisterActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(emailStr)){
             Toast toast = Toast.makeText(this, "Please Enter Email ID", Toast.LENGTH_SHORT);
             toast.show();
+            return;
 
         }
 
         if(TextUtils.isEmpty(passwordStr)){
             Toast toast = Toast.makeText(this, "Please Enter Password", Toast.LENGTH_SHORT);
             toast.show();
-
+            return;
         }
+
+        if (passwordStr.length() < 8) {
+            Toast.makeText(this, "Password Length must be greater than 8 letters", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
 
         firebaseAuth.createUserWithEmailAndPassword(emailStr,passwordStr).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override

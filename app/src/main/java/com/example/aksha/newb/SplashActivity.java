@@ -7,24 +7,26 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class SplashActivity extends AppCompatActivity {
 
 
     Animation fromBottom;
-    ImageView imageView;
+//    ImageView imageView;
+    TextView textView;
     private static int SPLASH_TIME_OUT = 4000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        imageView = findViewById(R.id.imageViewAppLogo);
+        textView = findViewById(R.id.textView5);
 
         fromBottom = AnimationUtils.loadAnimation(this, R.anim.frombottom);
         fromBottom.setDuration(2000);
 
-        imageView.setAnimation(fromBottom);
-
+//        imageView.setAnimation(fromBottom);
+        textView.setAnimation(fromBottom);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

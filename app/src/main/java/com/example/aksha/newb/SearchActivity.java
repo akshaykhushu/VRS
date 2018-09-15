@@ -102,6 +102,7 @@ public class SearchActivity extends AppCompatActivity {
                     descriptionList.clear();
                     latiList.clear();
                     longList.clear();
+                    bitmapList2D.clear();
                     resultList.removeAllViews();
                     hashMap.clear();
                 }
@@ -129,12 +130,14 @@ public class SearchActivity extends AppCompatActivity {
                 costList.clear();
                 bitmapList.clear();
                 descriptionList.clear();
+                bitmapList2D.clear();
                 latiList.clear();
                 longList.clear();
                 hashMap.clear();
                 resultList.removeAllViews();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    bitmapList = new ArrayList<>();
                     String title = snapshot.child("Title").getValue(String.class);
                     String cost = snapshot.child("Cost").getValue(String.class);
                     //String bitmap = snapshot.child("Bitmap").getValue(String.class);
