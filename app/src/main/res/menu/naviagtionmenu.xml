@@ -13,7 +13,6 @@
         <!--android:id="@+id/nav_Categories"-->
         <!--android:title="Categories" />-->
 
-
     <item
         android:id="@+id/nav_Help"
         android:title="Help" />

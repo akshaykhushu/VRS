@@ -3,6 +3,7 @@ package com.example.aksha.newb;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,7 +34,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class SearchActivity extends AppCompatActivity {
@@ -50,6 +53,9 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<String> uidList;
     ArrayList<String> latiList;
     ArrayList<String> longList;
+    Double myLatitude;
+    Double myLongitude;
+    ArrayList<Double> distanceList;
     SearchAdapter searchAdapter;
     public static HashMap<String, MarkerInfoSearch> hashMap;
 
@@ -73,6 +79,7 @@ public class SearchActivity extends AppCompatActivity {
         hashMap = new HashMap<>();
         bitmapList = new ArrayList<>();
         latiList = new ArrayList<>();
+        distanceList = new ArrayList<>();
         longList = new ArrayList<>();
         uidList = new ArrayList<>();
 
@@ -95,10 +102,10 @@ public class SearchActivity extends AppCompatActivity {
                     setAdapter(s.toString());
                 }
                 else {
-
                     titleList.clear();
                     costList.clear();
                     bitmapList.clear();
+                    distanceList.clear();
                     descriptionList.clear();
                     latiList.clear();
                     longList.clear();
@@ -125,7 +132,6 @@ public class SearchActivity extends AppCompatActivity {
 
                 int counter = 0;
 
-
                 titleList.clear();
                 costList.clear();
                 bitmapList.clear();
@@ -133,6 +139,7 @@ public class SearchActivity extends AppCompatActivity {
                 bitmapList2D.clear();
                 latiList.clear();
                 longList.clear();
+                distanceList.clear();
                 hashMap.clear();
                 resultList.removeAllViews();
 
@@ -161,7 +168,22 @@ public class SearchActivity extends AppCompatActivity {
                     markerInfoSearch.setId(id);
                     markerInfoSearch.setTotalImages(totalImages);
 
+
+                    GPSTracker tracker = new GPSTracker(getApplicationContext());
+                    if (!tracker.canGetLocation()) {
+                        tracker.showSettingsAlert();
+                    } else {
+                        myLatitude = tracker.getLatitude();
+                        myLongitude = tracker.getLongitude();
+                    }
+                    float[] distance = new float[10];
+
                     if(title.toLowerCase().contains(searchedString.toLowerCase())){
+                        Location.distanceBetween(myLatitude, myLongitude, Double.parseDouble(latitude), Double.parseDouble(longitude), distance);
+                        double distMiles = (double) distance[0] * 0.000621371;
+                        String dist = new DecimalFormat("#.##").format(Double.valueOf(distMiles));
+                        Double distDouble = Double.parseDouble(dist);
+                        distanceList.add(distDouble);
                         titleList.add(title);
                         costList.add(cost);
                         bitmapList2D.add(bitmapList);
@@ -172,6 +194,11 @@ public class SearchActivity extends AppCompatActivity {
                         hashMap.put(id, markerInfoSearch);
                         counter++;
                     }else if (description.toLowerCase().contains(searchedString.toLowerCase())){
+                        Location.distanceBetween(myLatitude, myLongitude, Double.parseDouble(latitude), Double.parseDouble(longitude), distance);
+                        double distMiles = (double) distance[0] * 0.000621371;
+                        String dist = new DecimalFormat("#.##").format(Double.valueOf(distMiles));
+                        Double distDouble = Double.parseDouble(dist);
+                        distanceList.add(distDouble);
                         titleList.add(title);
                         costList.add(cost);
                         bitmapList2D.add(bitmapList);
@@ -183,11 +210,12 @@ public class SearchActivity extends AppCompatActivity {
                         counter++;
                     }
 
+
                     if(counter == 15)
                         break;
                 }
 
-                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList2D, descriptionList, uidList, latiList, longList);
+                searchAdapter = new SearchAdapter(SearchActivity.this, titleList, costList, bitmapList2D, descriptionList, uidList, latiList, longList, distanceList);
                 resultList.setAdapter(searchAdapter);
 
             }

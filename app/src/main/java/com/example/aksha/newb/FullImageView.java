@@ -16,13 +16,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
 public class FullImageView extends AppCompatActivity {
-    ImageView imageView;
+    PhotoView imageView;
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
 
@@ -58,10 +59,11 @@ public class FullImageView extends AppCompatActivity {
 //                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
 //                    }
 //                });
-        matrix = imageView.getImageMatrix();
-        matrix.setScale(0.4f, 0.4f);
-        imageView.setImageMatrix(matrix);
-        savedMatrix = imageView.getImageMatrix();
+//        matrix = imageView.getImageMatrix();
+//        matrix.setScale(1f, 1f);
+
+//        imageView.setImageMatrix(matrix);
+//        savedMatrix = imageView.getImageMatrix();
     }
 
 

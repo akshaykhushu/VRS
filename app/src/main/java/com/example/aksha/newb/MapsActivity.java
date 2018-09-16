@@ -48,6 +48,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -78,6 +79,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +99,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String description;
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
+    public static Map<String, Double> markerInfoDistanceMap;
     int count=0;
+
 
     public static String UserId;
 
@@ -133,6 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setNavigationViewListner();
         UserId = getIntent().getStringExtra("UserId");
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
+        markerInfoDistanceMap = new HashMap<>();
         final NavigationView navigationView =  findViewById(R.id.navigation_view);
         View hView =  navigationView.getHeaderView(0);
 //        ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
@@ -163,6 +168,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        GPSTracker tracker = new GPSTracker(getApplicationContext());
+        if (!tracker.canGetLocation()) {
+            tracker.showSettingsAlert();
+        } else {
+            myLatitude = tracker.getLatitude();
+            myLongitude = tracker.getLongitude();
+        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -188,6 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 markerInfoMap.clear();
+                markerInfoDistanceMap.clear();
                 mMap.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MarkerInfo markerInfo = new MarkerInfo();
@@ -208,8 +222,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         markerInfo.setId(snapshot.child("Id").getValue().toString());
                         markerInfo.setTitle(snapshot.child("Title").getValue().toString());
                         title = snapshot.child("Title").getValue().toString();
+
+
+                        float[] distance = new float[10];
+                        Location.distanceBetween(myLatitude, myLongitude, Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()), distance);
+                        double distMiles = (double) distance[0] * 0.000621371;
+                        String dist = new DecimalFormat("#.##").format(Double.valueOf(distMiles));
+
+                        Double distDouble = Double.parseDouble(dist);
+
                         if (!markerInfoMap.containsKey(userId)){
                             MapsActivity.markerInfoMap.put(userId, markerInfo);
+                            MapsActivity.markerInfoDistanceMap.put(userId, distDouble);
                         }
                         setMarker(markerInfo);
                     }catch(Exception e){

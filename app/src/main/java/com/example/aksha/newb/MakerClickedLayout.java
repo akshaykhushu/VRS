@@ -168,7 +168,9 @@ public class MakerClickedLayout extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (current >= bitmapUrl.size() - 1) {
-                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+                    current = 0;
+                    Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
                     return;
                 }
                 current++;
@@ -192,7 +194,9 @@ public class MakerClickedLayout extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (current <= 0) {
-                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+                    current = bitmapUrl.size()-1;
+                    Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
                     return;
                 }
                 current--;
