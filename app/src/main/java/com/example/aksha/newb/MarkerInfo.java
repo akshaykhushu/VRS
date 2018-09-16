@@ -2,10 +2,16 @@ package com.example.aksha.newb;
 
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Icon;
+
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.util.ArrayList;
 
-class MarkerInfo {
+public class MarkerInfo implements ClusterItem {
     ArrayList<String> bitmapUrl;
     String cost;
     String description;
@@ -14,6 +20,15 @@ class MarkerInfo {
     String id;
     String title;
     Integer totalImages;
+    BitmapDescriptor icon;
+
+    public BitmapDescriptor getIcon() {
+        return icon;
+    }
+
+    public void setIcon(BitmapDescriptor icon) {
+        this.icon = icon;
+    }
 
     public Integer getTotalImages() {
         return totalImages;
@@ -23,8 +38,19 @@ class MarkerInfo {
         this.totalImages = totalImages;
     }
 
+    @Override
+    public LatLng getPosition() {
+        LatLng latLng = new LatLng(Double.parseDouble(getLatitude()), Double.parseDouble(getLongitude()));
+        return latLng;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public String getSnippet() {
+        return null;
     }
 
     public void setTitle(String title) {
@@ -78,4 +104,5 @@ class MarkerInfo {
     public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
+
 }

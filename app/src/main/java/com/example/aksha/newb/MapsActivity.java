@@ -100,15 +100,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
     public static Map<String, Double> markerInfoDistanceMap;
+    public ClusterManager<MarkerInfo> mClusterManager;
+//    ClusterManager<MarkerItem> clusterManager;
     int count=0;
 
 
     public static String UserId;
-
-
-    private ClusterManager<com.example.aksha.newb.Marker> mClusterManager;
-
-
     Double myLatitude;
     Double myLongitude;
     Uri imageUri;
@@ -133,6 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
         mapFragment.getMapAsync(this);
         setNavigationViewListner();
         UserId = getIntent().getStringExtra("UserId");
@@ -250,24 +248,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void setUpCluster(Double longitude, Double latitude) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(longitude, latitude), 2));
-        mClusterManager = new ClusterManager<com.example.aksha.newb.Marker>(this, mMap);
-        
-        mMap.setOnCameraIdleListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
-        addItems(longitude, latitude);
-    }
+//    private void setUpCluster(Double longitude, Double latitude) {
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(longitude, latitude), 2));
+//        mClusterManager = new ClusterManager<com.example.aksha.newb.Marker>(this, mMap);
+//
+//        mMap.setOnCameraIdleListener(mClusterManager);
+//        mMap.setOnMarkerClickListener(mClusterManager);
+//        addItems(longitude, latitude);
+//    }
 
-    private void addItems(Double longitude, Double latitude) {
+//    private void addItems(Double longitude, Double latitude) {
 //        for (int i = 0; i < 10; i++) {
 //            double offset = i / 60d;
 //            latitude = latitude + offset;
 //            longitude = longitude + offset;
-            com.example.aksha.newb.Marker offsetItem = new com.example.aksha.newb.Marker(latitude, longitude);
-            mClusterManager.addItem(offsetItem);
+//            IconGenerator iconGenerator = new IconGenerator(this);
+//            iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+//            iconGenerator.setTextAppearance(R.style.iconGenText);
+//            LatLng current = new LatLng(latitude, longitude);
+//            Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
+//            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(iconBitmap);
+//            MarkerOptions markerOptions = new MarkerOptions()
+//                    .position(current)
+//                    .icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+//            MarkerItem offsetItem = new MarkerItem(markerOptions);
+//            clusterManager.addItem(offsetItem);
 //        }
-    }
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -302,6 +309,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
 
+        mClusterManager = new ClusterManager<>(this, mMap);
+        mClusterManager.setRenderer(new ClusterRenderer(getApplicationContext(), mMap, mClusterManager));
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 
@@ -324,34 +336,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             myLongitude = tracker.getLongitude();
         }
 
+//        clusterManager = new ClusterManager<MarkerItem>(getApplicationContext(), mMap);
+//        ClusterRenderer clusterRenderer = new ClusterRenderer(this, mMap, clusterManager);
+//        addItems(myLatitude, myLongitude);
 
         LatLng myLocation = new LatLng(myLatitude, myLongitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
+
+
     }
 
 
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-        final float roundPx = bitmap.getWidth();
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
-    }
+//    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+//        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+//
+//        Canvas canvas = new Canvas(output);
+//
+//        final int color = 0xff424242;
+//        final Paint paint = new Paint();
+//        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+//        final RectF rectF = new RectF(rect);
+//        final float roundPx = bitmap.getWidth();
+//
+//        paint.setAntiAlias(true);
+//        canvas.drawARGB(0, 0, 0, 0);
+//        paint.setColor(color);
+//        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+//
+//        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+//        canvas.drawBitmap(bitmap, rect, rect, paint);
+//
+//        return output;
+//    }
 
     public void ListView(View view){
         Intent intent = new Intent(this, ListActivity.class);
@@ -362,17 +379,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void setMarker(MarkerInfo markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
-
-        //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-
-        IconGenerator iconGenerator = new IconGenerator(this);
-//        iconGenerator.setColor(R.color.Green);
-        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-        iconGenerator.setTextAppearance(R.style.iconGenText);
-        Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
-        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
-        Marker marker = mMap.addMarker(mo);
-//        marker.setIcon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon()));
+//        IconGenerator iconGenerator = new IconGenerator(this);
+//        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+//        iconGenerator.setTextAppearance(R.style.iconGenText);
+//        Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
+//        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(iconBitmap);
+//        markerInfo.setIcon(bitmapDescriptor);
+//        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
+//        Marker marker = mMap.addMarker(mo);
+        mClusterManager.addItem(markerInfo);
+        mClusterManager.cluster();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
