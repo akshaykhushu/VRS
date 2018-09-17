@@ -76,7 +76,8 @@
         <activity android:name=".TermsAndConditions" />
         <activity android:name=".CategoryActivity" />
         <activity android:name=".Beverages" />
-        <activity android:name=".BeautyAndHygieneActivity"></activity>
+        <activity android:name=".BeautyAndHygieneActivity" />
+        <activity android:name=".EditInfoActivity"></activity>
     </application>
 
 </manifest>

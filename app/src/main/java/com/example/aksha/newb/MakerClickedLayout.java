@@ -63,12 +63,16 @@ public class MakerClickedLayout extends AppCompatActivity {
     HashMap<String, String> storedImagePath = new HashMap<>();
     ImageButton buttonNextMarkerClicked;
     ImageButton buttonPreviousMarkerClicked;
+    ImageButton imageButtonEdit;
     StorageReference storageReference;
     FirebaseAuth firebaseAuth;
     File outputFile;
     ImageButton imageButtonDelete;
     int i;
     Context context;
+    EditText eT;
+    EditText eTdes;
+    EditText eTcost;
 
     File myDir = null;
 
@@ -78,13 +82,14 @@ public class MakerClickedLayout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maker_clicked_layout);
 //        SGD = new ScaleGestureDetector(this, new ScaleListener());
-        EditText eT = findViewById(R.id.editTextNameMarkerClicked);
-        EditText eTdes = findViewById(R.id.editTextDescriptionMarkerClicked);
-        EditText eTcost = findViewById(R.id.editTextCostMarkerClicked);
+         eT = findViewById(R.id.editTextNameMarkerClicked);
+         eTdes = findViewById(R.id.editTextDescriptionMarkerClicked);
+         eTcost = findViewById(R.id.editTextCostMarkerClicked);
         imageView = findViewById(R.id.imageViewMarkerClicked);
         buttonNextMarkerClicked = findViewById(R.id.buttonNextMarkerClicked);
         buttonPreviousMarkerClicked = findViewById(R.id.buttonPreviousMarkerClicked);
         imageButtonDelete = findViewById(R.id.imageButtonDelete);
+        imageButtonEdit = findViewById(R.id.imageButtonEdit);
 
         firebaseAuth = FirebaseAuth.getInstance();
         eT.setText(getIntent().getStringExtra("Title").toString());
@@ -103,8 +108,33 @@ public class MakerClickedLayout extends AppCompatActivity {
 
         if (!id.equals(firebaseAuth.getUid())){
             imageButtonDelete.setVisibility(View.INVISIBLE);
+            imageButtonEdit.setVisibility(View.INVISIBLE);
         }
         context = getApplicationContext();
+
+
+        //******************************************************************************************
+//        imageButtonEdit.setVisibility(View.INVISIBLE);
+        //******************************************************************************************
+
+        imageButtonEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), EditInfoActivity.class);
+                intent.putExtra("Name", eT.getText().toString());
+                intent.putExtra("Desc", eTdes.getText().toString());
+                intent.putExtra("Cost", eTcost.getText().toString());
+                intent.putStringArrayListExtra("BitmapURL", bitmapUrl);
+                intent.putExtra("Id", id);
+                finish();
+                startActivity(intent);
+
+            }
+        });
+
+
+
+
         imageButtonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

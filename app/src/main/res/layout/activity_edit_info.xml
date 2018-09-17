@@ -15,14 +15,14 @@
 
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/imageViewEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="0dp"
             android:scaleType="centerCrop" />
 
         <ImageButton
-            android:id="@+id/buttonNext"
+            android:id="@+id/buttonNextEdit"
             android:layout_width="71dp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
@@ -31,16 +31,26 @@
             app:srcCompat="@android:drawable/ic_media_next" />
 
         <ImageButton
-            android:id="@+id/buttonPrevious"
+            android:id="@+id/buttonPreviousEdit"
             android:layout_width="68dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:src="@android:drawable/ic_media_previous" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButtonDeleteImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            app:srcCompat="@android:drawable/ic_menu_delete" />
+
     </RelativeLayout>
 
     <EditText
-        android:id="@+id/nameEditText"
+        android:id="@+id/nameEditTextEdit"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -53,7 +63,7 @@
         tools:layout_editor_absoluteY="298dp" />
 
     <EditText
-        android:id="@+id/editTextDescription"
+        android:id="@+id/editTextDescriptionEdit"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -71,7 +81,7 @@
         android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/spinnerCurrency"
+            android:id="@+id/spinnerCurrencyEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="11dp"
@@ -79,7 +89,7 @@
             android:spinnerMode="dialog" />
 
         <EditText
-            android:id="@+id/editTextCost"
+            android:id="@+id/editTextCostEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
@@ -97,28 +107,38 @@
         android:layout_weight="1">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonUpdateEdit"
             android:layout_width="0dp"
-            android:layout_weight="5"
             android:layout_height="match_parent"
+            android:layout_weight="3"
             android:background="@android:color/holo_orange_dark"
-            android:textColor="@android:color/white"
+            android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
+            android:textColor="@android:color/white"
+            android:text="Update" />
+        <Button
+            android:id="@+id/buttonCancelEdit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@android:color/holo_orange_dark"
             android:layout_marginRight="2dp"
             android:layout_marginBottom="2dp"
-            android:onClick="Upload"
-            android:text="Upload" />
+            android:layout_marginLeft="2dp"
+            android:textColor="@android:color/white"
+            android:text="Cancel" />
 
         <ImageButton
-            android:id="@+id/buttonMoreImages"
+            android:id="@+id/buttonMoreImagesEdit"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_orange_dark"
-            android:textColor="@android:color/white"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="2dp"
             android:layout_weight="1"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@android:color/holo_orange_dark"
             android:src="@android:drawable/ic_menu_camera" />
+
+
 
 
     </LinearLayout>

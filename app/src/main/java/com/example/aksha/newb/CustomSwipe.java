@@ -16,6 +16,7 @@ public class CustomSwipe extends PagerAdapter{
     public Context context;
     public ArrayList<String> bitmapUrl;
     public LayoutInflater layoutInflater;
+    public ImageView imageView;
 
     public CustomSwipe(Context context, ArrayList<String> bitmapUrl) {
         this.context = context;
@@ -31,7 +32,7 @@ public class CustomSwipe extends PagerAdapter{
     public Object instantiateItem(ViewGroup container, int position) {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemView = layoutInflater.inflate(R.layout.activity_maker_clicked_layout, container, false);
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.imageViewMarkerClicked);
+        ImageView imageView = (ImageView) itemView.findViewById(R.id.markerClickedImageView);
         Glide.with(context).load(bitmapUrl.get(position)).into(imageView);
         container.addView(itemView);
         return itemView;

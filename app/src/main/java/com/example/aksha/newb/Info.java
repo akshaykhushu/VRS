@@ -121,6 +121,8 @@ public class Info extends AppCompatActivity {
         bitmap = BitmapFactory.decodeFile(imageStr);
         imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(bitmap);
+
+
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -152,10 +154,14 @@ public class Info extends AppCompatActivity {
         buttonNext = findViewById(R.id.buttonNext);
         buttonPrevious = findViewById(R.id.buttonPrevious);
 
+
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (current >= downloadUrl.size()-1)   {
+                if (current >= downloadUrl.size() - 1) {
+//                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+                    current = 0;
+                    Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
                     return;
                 }
                 current++;
@@ -167,7 +173,10 @@ public class Info extends AppCompatActivity {
         buttonPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(current <= 0){
+                if (current <= 0) {
+//                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
+                    current = downloadUrl.size()-1;
+                    Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
                     return;
                 }
                 current--;
@@ -208,8 +217,6 @@ public class Info extends AppCompatActivity {
 
         try {
             if (resultCode == RESULT_OK) {
-
-
                 imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
                 File actualImage = new File(imageStr);
                 File compressedImageFile = null;
@@ -247,6 +254,12 @@ public class Info extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
     public void Upload(View view){
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -269,7 +282,6 @@ public class Info extends AppCompatActivity {
             latitude = tracker.getLatitude();
             longitude = tracker.getLongitude();
         }
-
 
         android_id = MapsActivity.UserId;
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -311,21 +323,21 @@ public class Info extends AppCompatActivity {
         finish();
     }
 
-    private Location getLastKnownLocation() {
-        locationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
-        List<String> providers = locationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers) {
-            Location l = locationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
-        }
-        return bestLocation;
-    }
+//    private Location getLastKnownLocation() {
+//        locationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+//        List<String> providers = locationManager.getProviders(true);
+//        Location bestLocation = null;
+//        for (String provider : providers) {
+//            Location l = locationManager.getLastKnownLocation(provider);
+//            if (l == null) {
+//                continue;
+//            }
+//            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+//                // Found best last known location: %s", l);
+//                bestLocation = l;
+//            }
+//        }
+//        return bestLocation;
+//    }
 
 }

@@ -92,7 +92,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
-    private GoogleMap mMap;
+    public static GoogleMap mMap;
     private Location currentLocation;
     public static int upload = 0;
     protected Bitmap bitmap, circularBitmap;
@@ -101,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected String cost;
     public static Map<String, MarkerInfo> markerInfoMap;
     public static Map<String, Double> markerInfoDistanceMap;
-    public ClusterManager<MarkerInfo> mClusterManager;
+    public static ClusterManager<MarkerInfo> mClusterManager;
 //    ClusterManager<MarkerItem> clusterManager;
     int count=0;
 
@@ -126,6 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         markerInfoMap = new HashMap<>();
+        markerInfoMap.clear();
         firebaseAuth = FirebaseAuth.getInstance();
         //mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -136,6 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         UserId = getIntent().getStringExtra("UserId");
         FloatingActionButton b = findViewById(R.id.CameraActionButton);
         markerInfoDistanceMap = new HashMap<>();
+        markerInfoDistanceMap.clear();
         final NavigationView navigationView =  findViewById(R.id.navigation_view);
         View hView =  navigationView.getHeaderView(0);
         TextView nav_user = hView.findViewById(R.id.textViewUserId);
@@ -274,6 +276,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
 
         mClusterManager = new ClusterManager<>(this, mMap);
+        mMap.clear();
+        mClusterManager.clearItems();
+        mClusterManager.cluster();
         mClusterManager.setRenderer(new ClusterRenderer(getApplicationContext(), mMap, mClusterManager));
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);

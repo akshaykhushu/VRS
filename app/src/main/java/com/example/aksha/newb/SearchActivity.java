@@ -108,6 +108,7 @@ public class SearchActivity extends AppCompatActivity {
                     distanceList.clear();
                     descriptionList.clear();
                     latiList.clear();
+                    uidList.clear();
                     longList.clear();
                     bitmapList2D.clear();
                     resultList.removeAllViews();
@@ -122,7 +123,6 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MapsActivitySearch.class);
         intent.putExtra("Search", searchField.getText().toString());
         startActivity(intent);
-        this.finish();
     }
 
     private void setAdapter(final String searchedString) {
@@ -140,6 +140,7 @@ public class SearchActivity extends AppCompatActivity {
                 bitmapList2D.clear();
                 latiList.clear();
                 longList.clear();
+                uidList.clear();
                 distanceList.clear();
                 hashMap.clear();
                 resultList.removeAllViews();
