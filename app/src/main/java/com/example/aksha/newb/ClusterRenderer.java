@@ -1,7 +1,9 @@
 package com.example.aksha.newb;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.provider.SyncStateContract;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -33,13 +35,38 @@ public  class ClusterRenderer<T extends ClusterItem> extends DefaultClusterRende
     @Override
     protected void onBeforeClusterItemRendered(T item,
                                                MarkerOptions markerOptions) {
-        MarkerInfo markerInfo = (MarkerInfo) item;
-        IconGenerator iconGenerator = new IconGenerator(context);
-        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-        iconGenerator.setTextAppearance(R.style.iconGenText);
-        Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
+
+
+        try{
+            MarkerInfo markerInfo = (MarkerInfo) item;
+            IconGenerator iconGenerator = new IconGenerator(context);
+            iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+            iconGenerator.setTextAppearance(R.style.iconGenText);
+            Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
 //        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(iconBitmap);
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        }catch(ClassCastException e){
+            MarkerInfoSearch markerInfo = (MarkerInfoSearch) item;
+            IconGenerator iconGenerator = new IconGenerator(context);
+            iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+            iconGenerator.setTextAppearance(R.style.iconGenText);
+            Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
+//        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(iconBitmap);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+        }
+
+
+    }
+
+    @Override
+    public void setOnClusterItemClickListener(ClusterManager.OnClusterItemClickListener<T> listener) {
+        super.setOnClusterItemClickListener(listener);
+
+        }
+
+    @Override
+    protected int getColor(int clusterSize) {
+        return Color.parseColor("#FF8C00");
     }
 
     @Override
@@ -51,11 +78,11 @@ public  class ClusterRenderer<T extends ClusterItem> extends DefaultClusterRende
     @Override
     protected void onClusterRendered(Cluster<T> cluster, Marker marker) {
         super.onClusterRendered(cluster, marker);
-        IconGenerator iconGenerator = new IconGenerator(context);
-        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-        iconGenerator.setTextAppearance(R.style.iconGenText);
-        Bitmap iconBitmap = iconGenerator.makeIcon(String.valueOf(cluster.getSize()));
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
+//        IconGenerator iconGenerator = new IconGenerator(context);
+//        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+//        iconGenerator.setTextAppearance(R.style.iconGenText);
+//        Bitmap iconBitmap = iconGenerator.makeIcon(String.valueOf(cluster.getSize()));
+//        marker.setIcon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
 //        marker.setVisible(false);
     }
 }

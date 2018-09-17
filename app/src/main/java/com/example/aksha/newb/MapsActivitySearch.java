@@ -21,6 +21,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +31,7 @@ import java.util.HashMap;
 public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
+    public ClusterManager<MarkerInfoSearch> mClusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +45,13 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
         EditText et = findViewById(R.id.editTextSearchBar);
         et.setText(getIntent().getStringExtra("Search"));
 
+
         et.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -77,6 +81,11 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
 
         mMap.setMyLocationEnabled(true);
 
+        mClusterManager = new ClusterManager<>(this, mMap);
+        mClusterManager.setRenderer(new ClusterRenderer(getApplicationContext(), mMap, mClusterManager));
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
 
@@ -100,39 +109,76 @@ public class MapsActivitySearch extends FragmentActivity implements OnMapReadyCa
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
     public void setMarker(MarkerInfoSearch markerInfo) {
 
         LatLng current = new LatLng(Double.parseDouble(markerInfo.getLatitude()), Double.parseDouble(markerInfo.getLongitude()));
         IconGenerator iconGenerator = new IconGenerator(this);
-//        iconGenerator.setColor(R.color.Green);
-        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-        iconGenerator.setTextAppearance(R.style.iconGenText);
-        Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
-        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
+////        iconGenerator.setColor(R.color.Green);
+//        iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+//        iconGenerator.setTextAppearance(R.style.iconGenText);
+//        Bitmap iconBitmap = iconGenerator.makeIcon(markerInfo.getTitle() + " | " + markerInfo.getCost());
+//        MarkerOptions mo = new MarkerOptions().position(current).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap)).title(markerInfo.getId());
+        mClusterManager.addItem(markerInfo);
+        mClusterManager.cluster();
 
-        Marker marker = mMap.addMarker(mo);
+//        Marker marker = mMap.addMarker(mo);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerInfoSearch>() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                String idMarker = marker.getTitle();
-                for (String id : SearchActivity.hashMap.keySet()) {
-                    if (id.equals(idMarker)) {
-                        Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                        intent.putStringArrayListExtra("Bitmap", SearchActivity.hashMap.get(id).getBitmapUrl());
-                        intent.putExtra("Title", SearchActivity.hashMap.get(id).getTitle());
-                        intent.putExtra("Description", SearchActivity.hashMap.get(id).getDescription());
-                        intent.putExtra("Cost", SearchActivity.hashMap.get(id).getCost());
-                        intent.putExtra("Latitude", SearchActivity.hashMap.get(id).getLatitude());
-                        intent.putExtra("Longitude", SearchActivity.hashMap.get(id).getLongitude());
-                        intent.putExtra("TotalImages", SearchActivity.hashMap.get(id).getTotalImages());
-                        intent.putExtra("Id", SearchActivity.hashMap.get(id).getId());
-                        startActivity(intent);
-                    }
-                }
+            public boolean onClusterItemClick(MarkerInfoSearch markerInfoSearch) {
+                Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
+                intent.putStringArrayListExtra("Bitmap", markerInfoSearch.getBitmapUrl());
+                intent.putExtra("Title", markerInfoSearch.getTitle());
+                intent.putExtra("Description", markerInfoSearch.getDescription());
+                intent.putExtra("Cost", markerInfoSearch.getCost());
+                intent.putExtra("Latitude", markerInfoSearch.getLatitude());
+                intent.putExtra("Longitude", markerInfoSearch.getLongitude());
+                intent.putExtra("TotalImages", markerInfoSearch.getTotalImages());
+                intent.putExtra("Id", markerInfoSearch.getId());
+                startActivity(intent);
                 return true;
             }
         });
+
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerInfoSearch>() {
+            @Override
+            public boolean onClusterClick(Cluster<MarkerInfoSearch> cluster) {
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        cluster.getPosition(), (float) Math.floor(mMap
+                                .getCameraPosition().zoom + 2)), 300,
+                        null);
+                return true;
+            }
+        });
+
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                String idMarker = marker.getTitle();
+//                for (String id : SearchActivity.hashMap.keySet()) {
+//                    if (id.equals(idMarker)) {
+//                        Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
+//                        intent.putStringArrayListExtra("Bitmap", SearchActivity.hashMap.get(id).getBitmapUrl());
+//                        intent.putExtra("Title", SearchActivity.hashMap.get(id).getTitle());
+//                        intent.putExtra("Description", SearchActivity.hashMap.get(id).getDescription());
+//                        intent.putExtra("Cost", SearchActivity.hashMap.get(id).getCost());
+//                        intent.putExtra("Latitude", SearchActivity.hashMap.get(id).getLatitude());
+//                        intent.putExtra("Longitude", SearchActivity.hashMap.get(id).getLongitude());
+//                        intent.putExtra("TotalImages", SearchActivity.hashMap.get(id).getTotalImages());
+//                        intent.putExtra("Id", SearchActivity.hashMap.get(id).getId());
+//                        startActivity(intent);
+//                    }
+//                }
+//                return true;
+//            }
+//        });
     }
 }

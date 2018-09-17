@@ -1,5 +1,6 @@
 package com.example.aksha.newb;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -70,9 +72,7 @@ public class MakerClickedLayout extends AppCompatActivity {
 
     File myDir = null;
 
-    //    Matrix matrix = new Matrix();
-//    Float scale = 10f;
-//    ScaleGestureDetector SGD;
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,7 +121,6 @@ public class MakerClickedLayout extends AppCompatActivity {
                                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
 
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        startActivity(i);
                                     finish();
                                     startActivity(intent);
                                 }
@@ -136,19 +135,6 @@ public class MakerClickedLayout extends AppCompatActivity {
 
             }
         });
-
-//        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).
-//                fetch(new Callback() {
-//                    @Override
-//                    public void onSuccess() {
-//                        Picasso.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
-//                    }
-//
-//                    @Override
-//                    public void onError() {
-//                        Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
 
         Button imageButton = findViewById(R.id.buttonDirections);
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -175,18 +161,7 @@ public class MakerClickedLayout extends AppCompatActivity {
                 }
                 current++;
                 Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-//                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
-//                        fetch(new Callback() {
-//                            @Override
-//                            public void onSuccess() {
-//                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
+
             }
         });
 
@@ -201,18 +176,7 @@ public class MakerClickedLayout extends AppCompatActivity {
                 }
                 current--;
                 Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-//                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).
-//                        fetch(new Callback() {
-//                            @Override
-//                            public void onSuccess() {
-//                                Picasso.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
-//                            }
-//
-//                            @Override
-//                            public void onError() {
-//                                Toast.makeText(getApplicationContext(), "Could Not Load Image", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
+
             }
         });
 

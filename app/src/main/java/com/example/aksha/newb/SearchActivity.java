@@ -122,6 +122,7 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MapsActivitySearch.class);
         intent.putExtra("Search", searchField.getText().toString());
         startActivity(intent);
+        this.finish();
     }
 
     private void setAdapter(final String searchedString) {

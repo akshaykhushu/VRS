@@ -69,6 +69,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.ui.BubbleIconFactory;
 import com.google.maps.android.ui.IconGenerator;
@@ -112,7 +113,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth firebaseAuth;
     ImageButton imgNavButton;
 
-
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference reference;
     public void setCurrentLocation(Location current) {
@@ -138,14 +138,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerInfoDistanceMap = new HashMap<>();
         final NavigationView navigationView =  findViewById(R.id.navigation_view);
         View hView =  navigationView.getHeaderView(0);
-//        ImageView user_nav_image = hView.findViewById(R.id.imageViewProfilePicture);
-//        try{
-//            user_nav_image.setImageURI(firebaseAuth.getCurrentUser().getPhotoUrl());
-//        }
-//        catch(NullPointerException e){
-//            Log.e("User Has no image", e.getLocalizedMessage());
-//            user_nav_image.setImageResource(R.drawable.ic_launcher_foreground);
-//        }
         TextView nav_user = hView.findViewById(R.id.textViewUserId);
         nav_user.setText(firebaseAuth.getCurrentUser().getEmail());
         EditText et = findViewById(R.id.editTextSearchBar);
@@ -248,34 +240,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-//    private void setUpCluster(Double longitude, Double latitude) {
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(longitude, latitude), 2));
-//        mClusterManager = new ClusterManager<com.example.aksha.newb.Marker>(this, mMap);
-//
-//        mMap.setOnCameraIdleListener(mClusterManager);
-//        mMap.setOnMarkerClickListener(mClusterManager);
-//        addItems(longitude, latitude);
-//    }
-
-//    private void addItems(Double longitude, Double latitude) {
-//        for (int i = 0; i < 10; i++) {
-//            double offset = i / 60d;
-//            latitude = latitude + offset;
-//            longitude = longitude + offset;
-//            IconGenerator iconGenerator = new IconGenerator(this);
-//            iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-//            iconGenerator.setTextAppearance(R.style.iconGenText);
-//            LatLng current = new LatLng(latitude, longitude);
-//            Bitmap iconBitmap = iconGenerator.makeIcon(title + " | " + cost);
-//            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(iconBitmap);
-//            MarkerOptions markerOptions = new MarkerOptions()
-//                    .position(current)
-//                    .icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-//            MarkerItem offsetItem = new MarkerItem(markerOptions);
-//            clusterManager.addItem(offsetItem);
-//        }
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -347,29 +311,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
-//    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
-//        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-//
-//        Canvas canvas = new Canvas(output);
-//
-//        final int color = 0xff424242;
-//        final Paint paint = new Paint();
-//        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-//        final RectF rectF = new RectF(rect);
-//        final float roundPx = bitmap.getWidth();
-//
-//        paint.setAntiAlias(true);
-//        canvas.drawARGB(0, 0, 0, 0);
-//        paint.setColor(color);
-//        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-//
-//        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-//        canvas.drawBitmap(bitmap, rect, rect, paint);
-//
-//        return output;
-//    }
-
     public void ListView(View view){
         Intent intent = new Intent(this, ListActivity.class);
         startActivity(intent);
@@ -391,27 +332,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mClusterManager.cluster();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MarkerInfo>() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                String idMarker = marker.getTitle();
-                for (String id : markerInfoMap.keySet()) {
-                    if (id.equals(idMarker)){
-                        Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
-                        intent.putExtra("TotalImages", markerInfoMap.get(id).getTotalImages());
-                        intent.putStringArrayListExtra("Bitmap", markerInfoMap.get(id).getBitmapUrl());
-                        intent.putExtra("Title", markerInfoMap.get(id).getTitle());
-                        intent.putExtra("Description", markerInfoMap.get(id).getDescription());
-                        intent.putExtra("Cost", markerInfoMap.get(id).getCost());
-                        intent.putExtra("Id", markerInfoMap.get(id).getId());
-                        intent.putExtra("Longitude", markerInfoMap.get(id).getLongitude());
-                        intent.putExtra("Latitude", markerInfoMap.get(id).getLatitude());
-                        startActivity(intent);
-                    }
-                }
+            public boolean onClusterItemClick(MarkerInfo markerInfo) {
+                Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
+                intent.putExtra("TotalImages",markerInfo.getTotalImages());
+                intent.putStringArrayListExtra("Bitmap", markerInfo.getBitmapUrl());
+                intent.putExtra("Title", markerInfo.getTitle());
+                intent.putExtra("Description", markerInfo.getDescription());
+                intent.putExtra("Cost", markerInfo.getCost());
+                intent.putExtra("Id", markerInfo.getId());
+                intent.putExtra("Longitude", markerInfo.getLongitude());
+                intent.putExtra("Latitude", markerInfo.getLatitude());
+                startActivity(intent);
                 return true;
             }
         });
+
+
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MarkerInfo>() {
+            @Override
+            public boolean onClusterClick(Cluster<MarkerInfo> cluster) {
+
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        cluster.getPosition(), (float) Math.floor(mMap
+                                .getCameraPosition().zoom + 2)), 300,
+                        null);
+                return true;
+            }
+        });
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                String idMarker = marker.getTitle();
+//                for (String id : markerInfoMap.keySet()) {
+//                    if (id.equals(idMarker)){
+//                        Intent intent = new Intent(getApplicationContext(), MakerClickedLayout.class);
+//                        intent.putExtra("TotalImages", markerInfoMap.get(id).getTotalImages());
+//                        intent.putStringArrayListExtra("Bitmap", markerInfoMap.get(id).getBitmapUrl());
+//                        intent.putExtra("Title", markerInfoMap.get(id).getTitle());
+//                        intent.putExtra("Description", markerInfoMap.get(id).getDescription());
+//                        intent.putExtra("Cost", markerInfoMap.get(id).getCost());
+//                        intent.putExtra("Id", markerInfoMap.get(id).getId());
+//                        intent.putExtra("Longitude", markerInfoMap.get(id).getLongitude());
+//                        intent.putExtra("Latitude", markerInfoMap.get(id).getLatitude());
+//                        startActivity(intent);
+//                    }
+//                }
+//                return true;
+//            }
+//        });
 
 
         LatLng myLocation = new LatLng(myLatitude, myLongitude);
