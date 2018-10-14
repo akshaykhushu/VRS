@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -23,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -103,6 +106,8 @@ public class EditInfoActivity extends AppCompatActivity {
             downloadUrl.add(Uri.parse(bitmapStr));
         }
 
+        disableDelete();
+
 
         Glide.with(getApplicationContext()).load(bitmapUrl.get(0)).into(imageView);
 
@@ -111,7 +116,15 @@ public class EditInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 downloadUrl.remove(current);
                 bitmapUrl.remove(current);
-                nextImage();
+                try{
+                    nextImage();
+                }
+                catch(IndexOutOfBoundsException e){
+                    Log.e("No More Images", "asdfdsf");
+                    Drawable drawable = getResources().getDrawable(R.drawable.search_layout);
+                    imageView.setImageDrawable(drawable);
+                }
+                disableDelete();
             }
         });
 
@@ -126,13 +139,12 @@ public class EditInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (current <= 0) {
-//                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
-                    current = bitmapUrl.size()-1;
-                    Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+                    current = downloadUrl.size()-1;
+                    Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
                     return;
                 }
                 current--;
-                Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+                Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
             }
         });
 
@@ -183,6 +195,11 @@ public class EditInfoActivity extends AppCompatActivity {
                 Log.e("Longitude", String.valueOf(longitude));
                 Log.e("Latitude", String.valueOf(latitude));
 
+
+                if ((downloadUrl.size() == 0) && (bitmapUrl.size() == 0) ){
+                    Toast.makeText(getApplicationContext(), "Please add an Image to continue", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (TextUtils.isEmpty(nameEdit.getText().toString()) || TextUtils.isEmpty((nameEdit.getText().toString().trim()))){
                     Toast.makeText(getApplicationContext(), "Name is a required Field", Toast.LENGTH_SHORT).show();
                     return;
@@ -231,16 +248,24 @@ public class EditInfoActivity extends AppCompatActivity {
 
     }
 
+    public void disableDelete(){
+        if (downloadUrl.size() < 1 ||  bitmapUrl.size() < 1){
+            deleteImageButton.setVisibility(View.INVISIBLE);
+        }
+        else {
+            deleteImageButton.setVisibility(View.VISIBLE);
+        }
+    }
 
     public void nextImage(){
-        if (current >= bitmapUrl.size() - 1) {
+        if (current >= downloadUrl.size() - 1) {
 //                    Toast.makeText(getApplicationContext(), "No More Images", Toast.LENGTH_SHORT).show();
             current = 0;
-            Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+            Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
             return;
         }
         current++;
-        Glide.with(getApplicationContext()).load(bitmapUrl.get(current)).into(imageView);
+        Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
     }
 
 
@@ -250,6 +275,7 @@ public class EditInfoActivity extends AppCompatActivity {
         try {
             if (resultCode == RESULT_OK) {
 
+                disableDelete();
 
                 imageStr = Environment.getExternalStorageDirectory() + "/test/testfile.jpg";
                 File actualImage = new File(imageStr);

@@ -171,7 +171,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.INTERNET, Manifest.permission.CAMERA
+                    Manifest.permission.INTERNET, Manifest.permission.CAMERA,android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION,
             }, 200);
             return;
         }
@@ -194,6 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
                 markerInfoMap.clear();
                 markerInfoDistanceMap.clear();
+                mClusterManager.clearItems();
                 mMap.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     MarkerInfo markerInfo = new MarkerInfo();
@@ -231,6 +232,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }catch(Exception e){
                         Log.e("Exception Caught","UserId Not found");
                     }
+
+
+
                 }
             }
 
@@ -259,6 +263,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public void refresh(){
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)

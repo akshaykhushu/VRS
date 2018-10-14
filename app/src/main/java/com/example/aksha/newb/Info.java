@@ -34,8 +34,11 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -77,6 +80,7 @@ public class Info extends AppCompatActivity {
     Double longitude;
     Double latitude;
     DatabaseReference databaseReference;
+    EditText eT;
 
 
     private final LocationListener locationListener = new LocationListener() {
@@ -121,7 +125,7 @@ public class Info extends AppCompatActivity {
         bitmap = BitmapFactory.decodeFile(imageStr);
         imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(bitmap);
-
+        eT = findViewById(R.id.nameEditText);
 
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -183,6 +187,8 @@ public class Info extends AppCompatActivity {
                 Glide.with(getApplicationContext()).load(downloadUrl.get(current)).into(imageView);
             }
         });
+
+
 
 
         Uri file = Uri.fromFile(compressedImageFile);
@@ -269,7 +275,7 @@ public class Info extends AppCompatActivity {
             }, 200);
             return;
         }
-        EditText eT = findViewById(R.id.nameEditText);
+        eT = findViewById(R.id.nameEditText);
         EditText eTdes = findViewById(R.id.editTextDescription);
         EditText eTcost = findViewById(R.id.editTextCost);
         Spinner spinner = findViewById(R.id.spinnerCurrency);
@@ -319,6 +325,7 @@ public class Info extends AppCompatActivity {
         databaseReference.child("Id").setValue(firebaseAuth1.getCurrentUser().getUid());
         MapsActivity.upload = 1;
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

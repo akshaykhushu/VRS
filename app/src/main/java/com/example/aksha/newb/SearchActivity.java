@@ -120,9 +120,15 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void MapView(View view){
-        Intent intent = new Intent(this, MapsActivitySearch.class);
-        intent.putExtra("Search", searchField.getText().toString());
-        startActivity(intent);
+
+        if (searchField.getText().toString().equals("") ){
+            super.onBackPressed();
+        }
+        else{
+            Intent intent = new Intent(this, MapsActivitySearch.class);
+            intent.putExtra("Search", searchField.getText().toString());
+            startActivity(intent);
+        }
     }
 
     private void setAdapter(final String searchedString) {
